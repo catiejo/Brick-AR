@@ -3,13 +3,13 @@ using UnityEngine.UI;
 using System.Collections;
 
 public class MenuController : MonoBehaviour {
-	public Texture[] brickTextures;
+	public Material[] brickMaterials;
 
-	private int _currentTexture = 0;
+	private int _currentMaterial = 0;
 	private bool _isAlreadyOpen = false;
 
-	public Texture GetCurrentTexture () {
-		return brickTextures [_currentTexture];
+	public Material GetCurrentMaterial () {
+		return brickMaterials [_currentMaterial];
 	}
 
 	public void MenuClicked() {
@@ -21,20 +21,20 @@ public class MenuController : MonoBehaviour {
 	}
 		
 	public void SelectOption(Button option) {
-		option.GetComponent<RectTransform> ().SetSiblingIndex (brickTextures.Length - 1);
+		option.GetComponent<RectTransform> ().SetSiblingIndex (brickMaterials.Length - 1);
 		// NOTE: needs to match order of items in brickTextures
 		switch (option.name) {
 			case "Beige":
-				_currentTexture = 0;
+				_currentMaterial = 0;
 				break;
 			case "Yellow":
-				_currentTexture = 1;
+				_currentMaterial = 1;
 				break;
 			case "Green":
-				_currentTexture = 2;
+				_currentMaterial = 2;
 				break;
 			case "Purple":
-				_currentTexture = 3;
+				_currentMaterial = 3;
 				break;
 		}
 		CollapseMenu();
