@@ -22,7 +22,7 @@ public class MenuController : MonoBehaviour {
 		
 	public void SelectOption(Button option) {
 		option.GetComponent<RectTransform> ().SetSiblingIndex (brickMaterials.Length - 1);
-		// NOTE: needs to match order of items in brickTextures
+		// NOTE: needs to match order of items in brickMaterials
 		switch (option.name) {
 			case "Beige":
 				_currentMaterial = 0;

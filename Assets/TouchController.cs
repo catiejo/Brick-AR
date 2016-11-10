@@ -12,10 +12,14 @@ public class TouchController : MonoBehaviour {
 	public TangoPointCloud pointCloud;
 
 	void Update () {
-		for(int i = 0; i < Input.touchCount; i++)
+		//FIXME: IsPointerOverGameObject doesn't work for TouchPhase.Ended 
+//		for(int i = 0; i < Input.touchCount; i++)
+		if (Input.touchCount >= 1)
 		{
-			Touch touch = Input.GetTouch (i);
-			if (touch.phase == TouchPhase.Ended && !EventSystem.current.IsPointerOverGameObject(touch.fingerId)) {
+			Touch touch = Input.GetTouch (0);
+			bool pointOverGameObject = EventSystem.current.IsPointerOverGameObject (touch.fingerId);
+			if (touch.phase == TouchPhase.Began && !pointOverGameObject) {
+				depthText.text = " " + touch.fingerId.ToString() + "=" + pointOverGameObject.ToString() + " " + depthText.text; // For testing purposes
 				PositionBricks (touch.position);
 			}
 		}
@@ -24,7 +28,7 @@ public class TouchController : MonoBehaviour {
 	}
 
 	void PositionBricks(Vector2 touchCoordinates) {
-		depthText.text = "average depth is: " + pointCloud.m_overallZ; // For testing purposes
+//		depthText.text = "average depth is: " + pointCloud.m_overallZ; // For testing purposes
 		float x = (float)(touchCoordinates.x / Screen.width);
 		float y = (float)(touchCoordinates.y / Screen.height);
 		float z = pointCloud.m_overallZ;
