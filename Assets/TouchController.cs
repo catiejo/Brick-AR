@@ -10,6 +10,7 @@ public class TouchController : MonoBehaviour {
 	public MenuController menu;
 	public Camera camera;
 	public TangoPointCloud pointCloud;
+	private float _threshold = 0;
 
 	void Update () {
 		if (Input.touchCount > 0)
@@ -28,9 +29,56 @@ public class TouchController : MonoBehaviour {
 		Vector3 up;
 		Plane plane;
 		if (pointCloud.FindPlane (camera, touchCoordinates, out planeCenter, out plane)) {
+			depthText.text = pointCloud.m_pointsCount.ToString();
+			int count = 0;
+			Vector3 topLeft = planeCenter;
+			Vector3 bottomRight = planeCenter;
+			Vector3 x = planeCenter;
+			Vector3 y = planeCenter;
+			Vector3 z = planeCenter;
+			for (int i = 0; i < pointCloud.m_pointsCount; i++) {
+				Vector3 p = pointCloud.m_points [i];
+				if (Mathf.Abs(plane.GetDistanceToPoint(p)) <= _threshold) {
+					count++;
+//					if (p.x >= x.x) {
+//						x = p;
+//					}
+//					if (p.y >= y.y) {
+//						y = p;
+//					}
+//					if (p.z >= z.z) {
+//						z = p;
+//					}
+//					if (isBetterTopLeft (p, topLeft)) {
+//						topLeft = p;
+//					}
+//					if (isBetterBottomRight (p, bottomRight)) {
+//						bottomRight = p;
+//					}
+				}
+				depthText.text = count + "/" + pointCloud.m_pointsCount + " points on surface";
+			}
+//			GameObject topLeftPt = GameObject.CreatePrimitive (PrimitiveType.Sphere);
+//			topLeftPt.transform.localScale *= 0.05f;
+//			topLeftPt.transform.position = topLeft;
+//			GameObject bottomRightPt = GameObject.CreatePrimitive (PrimitiveType.Sphere);
+//			bottomRightPt.transform.localScale *= 0.05f;
+//			bottomRightPt.transform.position = bottomRight;
+//			GameObject xPt = GameObject.CreatePrimitive (PrimitiveType.Sphere);
+//			xPt.transform.localScale *= 0.05f;
+//			xPt.transform.position = x;
+//			xPt.GetComponent<Renderer> ().material.color = Color.red;
+//			GameObject yPt = GameObject.CreatePrimitive (PrimitiveType.Sphere);
+//			yPt.transform.localScale *= 0.05f;
+//			yPt.transform.position = x;
+//			yPt.GetComponent<Renderer> ().material.color = Color.green;
+//			GameObject zPt = GameObject.CreatePrimitive (PrimitiveType.Sphere);
+//			zPt.transform.localScale *= 0.05f;
+//			zPt.transform.position = x;
+//			zPt.GetComponent<Renderer> ().material.color = Color.blue;
 			up = plane.normal;
 			float angle = Vector3.Angle (up, camera.transform.forward);
-			depthText.text = "angle with normal is " + angle + " degrees.";
+//			depthText.text = "angle with normal is " + angle + " degrees.";
 			if (angle < 175) {
 				Vector3 right = Vector3.Cross(up, camera.transform.forward).normalized;
 				forward = Vector3.Cross(right, up).normalized;
@@ -51,5 +99,40 @@ public class TouchController : MonoBehaviour {
 //		float y = (float)(touchCoordinates.y / Screen.height);
 //		float z = pointCloud.m_overallZ;
 //		brickpic.transform.position = camera.ViewportToWorldPoint(new Vector3(x, y, z));
+	}
+
+	private bool isBetterTopLeft(Vector3 checkPoint, Vector3 refPoint) {
+//		if (checkPoint.x <= refPoint.x && checkPoint.y <= refPoint.y && checkPoint.z <= refPoint.z) {
+		if (checkPoint.x <= refPoint.x && checkPoint.y <= refPoint.y) {
+			return true;
+		}
+		return false;
+	}
+
+	private bool isBetterBottomRight(Vector3 checkPoint, Vector3 refPoint) {
+//		if (checkPoint.x >= refPoint.x && checkPoint.y >= refPoint.y && checkPoint.z >= refPoint.z) {
+		if (checkPoint.x >= refPoint.x && checkPoint.y >= refPoint.y) {
+			return true;
+		}
+		return false;
+	}
+
+	public void incThresh() {
+		_threshold += 0.01f;
+		depthText.text = "Threshold is now " + _threshold;
+	}
+
+	public void decThresh() {
+		if (_threshold > 0) {
+			_threshold -= 0.01f;
+		}
+		depthText.text = "Threshold is now " + _threshold;
+	}
+
+	public void FindSurface() {
+		//Make an empty list of Vector3
+		//Iterate through the point cloud
+			//if a point lies on the plane (or is within a certain margin of error), add it to the list
+		//Compute the convex hull of the list
 	}
 }
