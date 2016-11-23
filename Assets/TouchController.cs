@@ -31,22 +31,26 @@ public class TouchController : MonoBehaviour {
 	}
 
 	private bool CreateSurface(Vector2 touch) {
-		List<Vector3> vertices = new List<Vector3> ();
 		Vector3 planeCenter;
 		Plane plane;
 		if (tangoPointCloud.FindPlane (Camera.main, touch, out planeCenter, out plane)) {
-			for (int i = 0; i < tangoPointCloud.m_pointsCount; i++) {
-				Vector3 p = tangoPointCloud.m_points [i];
-				if (Mathf.Abs(plane.GetDistanceToPoint(p)) <= planeDistanceThreshold) {
-					vertices.Add(p);
-				}
-			}
-			debug.text = "Found " + vertices.Count + " vertices.";
 			Surface surface = Instantiate(surfaceTemplate) as Surface;
-			surface.Create(vertices, plane, planeCenter, brickMenu.GetCurrentMaterial());
+			surface.Create(FindSurfaceVertices(plane), plane, planeCenter, brickMenu.GetCurrentMaterial());
 			return true;
 		}
 		return false;
+	}
+
+	private List<Vector3> FindSurfaceVertices(Plane plane) {
+		List<Vector3> vertices = new List<Vector3> ();
+		for (int i = 0; i < tangoPointCloud.m_pointsCount; i++) {
+			Vector3 p = tangoPointCloud.m_points [i];
+			if (Mathf.Abs(plane.GetDistanceToPoint(p)) <= planeDistanceThreshold) {
+				vertices.Add(p);
+			}
+		}
+		debug.text = "Found " + vertices.Count + " vertices.";
+		return vertices;
 	}
 
 }
