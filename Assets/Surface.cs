@@ -6,17 +6,13 @@ using System.Collections.Generic; //Lists
 using Tango;
 
 public class Surface : MonoBehaviour {
-	private Vector3 _center;
-	private Vector3[] _vertices;
-	private Vector2[] _uv;
 	private Plane _plane;
-	private int[] _faces;
 	private Vector3 _planeCenter;
-	private Vector2 _dimensions;
-	private Text debug;
 	private Material _material;
-
-	// Helper class for MIConvexHull
+	private int[] _triangles;
+	private Vector2[] _uv;
+	private Vector3[] _vertices;
+	//Helper class for MIConvexHull
 	public class MIVertex : IVertex
 	{
 		public int Index;
@@ -32,90 +28,46 @@ public class Surface : MonoBehaviour {
 		}
 	}
 
-	public void Create(List<Vector3> vertices, Plane plane, Vector3 planeCenter, Material material) {
-		// find axes
-		var xaxis = Quaternion.LookRotation (_plane.normal) * Vector3.right;
-		var pos = Camera.main.transform.position + Camera.main.transform.rotation * Vector3.forward * 3f;
-		Debug.DrawLine (pos, pos + xaxis, Color.cyan, 15f); 
+	public void Create(List<Vector3> worldVertices, Plane plane, Vector3 planeCenter, Material material) {
+		//Define plane coordinate system
+		var xaxis = Quaternion.LookRotation (_plane.normal) * Vector3.right; //Horizontal vector transformed to plane's rotation
 		var yaxis = Vector3.Cross(xaxis, _plane.normal);
-		Debug.DrawLine (pos, pos + yaxis, Color.magenta, 15f); 
-		// set position and rotation (uses yaxis which is why we have to define it here)
+		//Position plane
 		transform.position = _planeCenter;
 		transform.rotation = Quaternion.LookRotation (_plane.normal, yaxis);
-
+		//Set up mesh
 		_plane = plane;
-		_material = material;
 		_planeCenter = planeCenter;
-		_vertices = Convertices(vertices);
-		_faces = FindFaces ();
+		_material = material;
+		_vertices = FindLocalVertices(worldVertices);
+		_triangles = FindTriangles ();
 		_uv = FindUV ();
 		CreateMesh ();
-//		FindDimensions ();
-//		CreatePlane ();
-	}
-
-	private Vector3[] Convertices(List<Vector3> worldVertices) {
-		var localVertices = new List<Vector3>();
-		foreach (var v in worldVertices) {
-			localVertices.Add(transform.InverseTransformPoint(v));
-		}
-		return localVertices.ToArray ();
 	}
 
 	private void CreateMesh() {
 		Mesh mesh = new Mesh();
 		mesh.Clear();
 		mesh.MarkDynamic();
-
 		mesh.vertices = _vertices;
 		mesh.uv = _uv;
-		mesh.triangles = _faces;
+		mesh.triangles = _triangles;
 		GetComponent<MeshFilter>().mesh = mesh;
 		GetComponent<MeshRenderer> ().material = _material;
 	}
 
-	private void CreatePlane() {
-		Vector3 forward;
-		Vector3 up = _plane.normal;
-		float angle = Vector3.Angle (up, Camera.main.transform.forward);
-		if (angle < 175) {
-			Vector3 right = Vector3.Cross(up, Camera.main.transform.forward).normalized;
-			forward = Vector3.Cross(right, up).normalized;
-		} else {
-			// Normal is nearly parallel to camera look direction, the cross product would have too much
-			// floating point error in it.
-			forward = Vector3.Cross(up, Camera.main.transform.right);
+	private Vector3[] FindLocalVertices(List<Vector3> worldVertices) {
+		var localVertices = new List<Vector3>();
+		foreach (var worldVertex in worldVertices) {
+			localVertices.Add(transform.InverseTransformPoint(worldVertex));
 		}
-//		transform.localScale = new Vector3(_dimensions.x, _dimensions.y, 1.0f);
-//		transform.localScale *= 0.03f;
-		transform.position = _planeCenter;
-		transform.rotation = Quaternion.LookRotation(forward, up);
-		GetComponent<Renderer> ().material = _material;
+		return localVertices.ToArray ();
 	}
 
-	private void FindDimensions() {
-		Vector2 _min = Vector2.zero;
-		Vector2 _max = Vector2.zero;
-		foreach (Vector3 worldCoord in _vertices) {
-			Vector3 localCoord = worldCoord - _planeCenter;
-			_min.x = (localCoord.x < _min.x) ? localCoord.x : _min.x;
-			_min.y = (localCoord.y < _min.y) ? localCoord.y : _min.y;
-			_max.x = (localCoord.x > _max.x) ? localCoord.x : _max.x;
-			_max.y = (localCoord.y > _max.y) ? localCoord.y : _max.y;
-		}
-		_dimensions.x = _max.x - _min.x;
-		_dimensions.y = _max.y - _min.y;
-		//Find Center
-		float x = _max.x - (_dimensions.x/2.0f) + _planeCenter.x;
-		float y = _max.y - (_dimensions.y/2.0f) + _planeCenter.y;
-		float z = _planeCenter.z;
-		_center = new Vector3(x, y, z);
-	}
-
-	private int[] FindFaces() {
-		var faces = new List<int>();
+	private int[] FindTriangles() {
+		var triangles = new List<int>();
 		var miVertices = new List<MIVertex>();
-
+		//Convert vertices to MIVertices
 		for (int i = 0; i < _vertices.Length; ++i)
 		{
 			var miVertex = new MIVertex();
@@ -124,22 +76,22 @@ public class Surface : MonoBehaviour {
 			miVertex.Position = new double[3]{vertex.x, vertex.y, vertex.z};
 			miVertices.Add(miVertex);
 		}
-
+		//Generate convex hull + extract faces
 		var hull = ConvexHull.Create(miVertices);
 		foreach (var face in hull.Faces)
 		{
 			foreach (var vertex in face.Vertices)
 			{
-				faces.Add(vertex.Index);
+				triangles.Add(vertex.Index);
 			}
 		}
-		return faces.ToArray();
+		return triangles.ToArray();
 	}
 
 	private Vector2[] FindUV() {
 		var uv = new List<Vector2>();
 		foreach (var vertex in _vertices) {
-			uv.Add(vertex); //code knows to discard z coord
+			uv.Add(vertex); //Add method knows to discard z coordinate
 		}
 		return uv.ToArray ();
 	}
