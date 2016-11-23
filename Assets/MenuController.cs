@@ -4,7 +4,6 @@ using System.Collections;
 
 public class MenuController : MonoBehaviour {
 	public Material[] brickMaterials;
-
 	private int _currentMaterial = 0;
 	private bool _isAlreadyOpen = false;
 
@@ -22,7 +21,7 @@ public class MenuController : MonoBehaviour {
 		
 	public void SelectOption(Button option) {
 		option.GetComponent<RectTransform> ().SetSiblingIndex (brickMaterials.Length - 1);
-		// NOTE: needs to match order of items in brickMaterials
+		//NOTE: indices need to match order of items in brickMaterials (e.g. beige material is located at index 0)
 		switch (option.name) {
 			case "Beige":
 				_currentMaterial = 0;
