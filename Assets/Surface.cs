@@ -32,23 +32,46 @@ public class Surface : MonoBehaviour {
 		}
 	}
 
-	public void Create(Vector3[] vertices, Plane plane, Vector3 planeCenter, Material material) {
+	public void Create(List<Vector3> vertices, Plane plane, Vector3 planeCenter, Material material) {
+		// find axes
+		var xaxis = Quaternion.LookRotation (_plane.normal) * Vector3.right;
+		var pos = Camera.main.transform.position + Camera.main.transform.rotation * Vector3.forward * 3f;
+		Debug.DrawLine (pos, pos + xaxis, Color.cyan, 15f); 
+		var yaxis = Vector3.Cross(xaxis, _plane.normal);
+		Debug.DrawLine (pos, pos + yaxis, Color.magenta, 15f); 
+		// set position and rotation (uses yaxis which is why we have to define it here)
+		transform.position = _planeCenter;
+		transform.rotation = Quaternion.LookRotation (_plane.normal, yaxis);
+
 		_plane = plane;
 		_material = material;
 		_planeCenter = planeCenter;
-		_vertices = vertices;
+		_vertices = Convertices(vertices);
 		_faces = FindFaces ();
 		_uv = FindUV ();
 		CreateMesh ();
+//		FindDimensions ();
+//		CreatePlane ();
+	}
+
+	private Vector3[] Convertices(List<Vector3> worldVertices) {
+		var localVertices = new List<Vector3>();
+		foreach (var v in worldVertices) {
+			localVertices.Add(transform.InverseTransformPoint(v));
+		}
+		return localVertices.ToArray ();
 	}
 
 	private void CreateMesh() {
 		Mesh mesh = new Mesh();
-		GetComponent<MeshFilter>().mesh = mesh;
+		mesh.Clear();
+		mesh.MarkDynamic();
+
 		mesh.vertices = _vertices;
 		mesh.uv = _uv;
 		mesh.triangles = _faces;
-		CreatePlane ();
+		GetComponent<MeshFilter>().mesh = mesh;
+		GetComponent<MeshRenderer> ().material = _material;
 	}
 
 	private void CreatePlane() {
@@ -63,8 +86,9 @@ public class Surface : MonoBehaviour {
 			// floating point error in it.
 			forward = Vector3.Cross(up, Camera.main.transform.right);
 		}
-		transform.localScale = new Vector3(_dimensions.x, _dimensions.y, 1.0f);
-		transform.position = _center;
+//		transform.localScale = new Vector3(_dimensions.x, _dimensions.y, 1.0f);
+//		transform.localScale *= 0.03f;
+		transform.position = _planeCenter;
 		transform.rotation = Quaternion.LookRotation(forward, up);
 		GetComponent<Renderer> ().material = _material;
 	}
@@ -113,15 +137,9 @@ public class Surface : MonoBehaviour {
 	}
 
 	private Vector2[] FindUV() {
-		FindDimensions (); //sets _dimensions and _center...might not be needed if using hull
 		var uv = new List<Vector2>();
-		var xaxis = Quaternion.LookRotation (_plane.normal) * Vector3.right;
-		var yaxis = Vector3.Cross(xaxis, _plane.normal);
 		foreach (var vertex in _vertices) {
-			var delta = vertex - _center;
-			var xcoord = Vector3.Project (delta, xaxis);
-			var ycoord = Vector3.Project (delta, yaxis);
-			uv.Add(new Vector2(xcoord.x, ycoord.y));
+			uv.Add(vertex); //code knows to discard z coord
 		}
 		return uv.ToArray ();
 	}
