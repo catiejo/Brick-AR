@@ -19,8 +19,12 @@ public class UniqueQueue<T> : IEnumerable<T> {
 
 	public int Count {
 		get {
-			return hashSet.Count;
+			return queue.Count;
 		}
+	}
+
+	public bool isEmpty() {
+		return Count == 0;
 	}
 
 	public void Clear() {
@@ -33,6 +37,9 @@ public class UniqueQueue<T> : IEnumerable<T> {
 		return hashSet.Contains(item);
 	}
 
+	public bool Visited(T item) {
+		return Contains (item);
+	}
 
 	public void Enqueue(T item) {
 		if (hashSet.Add(item)) {
@@ -42,7 +49,7 @@ public class UniqueQueue<T> : IEnumerable<T> {
 
 	public T Dequeue() {
 		T item = queue.Dequeue();
-		hashSet.Remove(item);
+//		hashSet.Remove(item);
 		return item;
 	}
 
