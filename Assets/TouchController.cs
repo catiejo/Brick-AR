@@ -76,17 +76,15 @@ public class TouchController : MonoBehaviour {
 			var currentPoint = pointsToCheck.Dequeue ();
 			var neighbors = pointCloudOctree.GetNearby (new Ray(Camera.main.transform.position, currentPoint.position), 0.1f);
 			debug.text = "There are " + neighbors.Length + " neighbors nearby";
-			var neighborsOnPlane = 0;
 			foreach (var neighbor in neighbors) {
-				if (Mathf.Abs(plane.GetDistanceToPoint(neighbor.position)) <= planeDistanceThreshold) {
-					pointsToCheck.Enqueue(neighbor);
-					neighborsOnPlane++;
+				if (!pointsToCheck.Contains(neighbor)) {
+					pointsToCheck.Enqueue (neighbor);
 				}
-				pointCloudOctree.Remove (neighbor); //Already visited
 			}
-			if (neighborsOnPlane > neighborThreshold) {
+			if (neighbors.Length > neighborThreshold) {
 				verticesOnSurface.Add (currentPoint.position);
 			}
+			pointCloudOctree.Remove (currentPoint); //Already visited
 //			debug.text = "there are " + pointsToCheck.Count + " points left in the queue";
 		}
 //		debug.text = "Found " + verticesOnSurface.Count + " vertices.";
