@@ -6,6 +6,7 @@ using System.Collections.Generic; //Lists
 using Tango;
 
 public class Surface : MonoBehaviour {
+	private Text debug;
 	private Plane _plane;
 	private Vector3 _planeCenter;
 	private Material _material;
@@ -27,6 +28,11 @@ public class Surface : MonoBehaviour {
 			return new Vector3((float)position[0], (float)position[1], (float)position[2]);
 		}
 	}
+
+//	void Start() {
+//		debug = GameObject.FindWithTag ("Debug").GetComponent<Text>();
+//		debug.text = "surface created";
+//	}
 
 	public void Create(List<Vector3> worldVertices, Plane plane, Vector3 planeCenter, Material material) {
 		//Define plane coordinate system

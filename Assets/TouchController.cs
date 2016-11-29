@@ -9,8 +9,8 @@ using KDTree;
 public class TouchController : MonoBehaviour {
 	public MenuController brickMenu;
 	public Text debug; //For testing purposes
-	public int neighborCountThreshold = 25;
-	public float neighborDistanceThreshold = .25f;
+	public int neighborCountThreshold = 15;
+	public float neighborDistanceThreshold = .05f;
 	public float planeDistanceThreshold = 0.02f;
 	public Surface surfaceTemplate;
 	public TangoPointCloud tangoPointCloud;
@@ -47,11 +47,11 @@ public class TouchController : MonoBehaviour {
 		Plane plane;
 		if (tangoPointCloud.FindPlane (Camera.main, touch, out planeCenter, out plane)) {
 			var surfaceVertices = FindSurfaceVertices (plane, planeCenter);
-//			if (surfaceVertices.Count != 0) {
-//				Surface surface = Instantiate (surfaceTemplate) as Surface;
-//				surface.Create (surfaceVertices, plane, planeCenter, brickMenu.GetCurrentMaterial ());
+			if (surfaceVertices.Count != 0) {
+				Surface surface = Instantiate (surfaceTemplate) as Surface;
+				surface.Create (surfaceVertices, plane, planeCenter, brickMenu.GetCurrentMaterial ());
 				return true;
-//			}
+			}
 		}
 		return false;
 	}
