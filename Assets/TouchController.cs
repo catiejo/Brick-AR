@@ -19,6 +19,7 @@ public class TouchController : MonoBehaviour {
 	{
 		public double[] doublePosition;
 		public Vector3 vectorPosition;
+		public bool visited = false;
 		public Point(Vector3 point) {
 			doublePosition = new double[3]{point.x, point.y, point.z};
 			vectorPosition = point;
@@ -83,8 +84,9 @@ public class TouchController : MonoBehaviour {
 			var neighbors = kdTree.NearestNeighbors(currentPoint.doublePosition, neighborCountThreshold, neighborDistanceThreshold);
 			int neighborCount = 0;
 			while (neighbors.MoveNext()) {
-				if (!pointsToCheck.Visited(neighbors.Current)) {
-					pointsToCheck.Enqueue (neighbors.Current);	
+				if (!neighbors.Current.visited) {
+					pointsToCheck.Enqueue (neighbors.Current);
+					neighbors.Current.visited = true;
 				}
 				neighborCount++;
 			}
