@@ -26,12 +26,35 @@ public class TouchController : MonoBehaviour {
 		}
 	}
 
+	/*DEBUGGING SURFACE FINDING*/
+	public Surface surface;
+	private TangoPointCloud surfacePC;
+	private Vector2 surfaceTP;
+	private Plane surfacePlane;
+	private Vector3 surfacePlaneCenter;
+	public void updateNeighborDistanceThreshold(float newValue) {
+		neighborDistanceThreshold = newValue;
+		updateDebug ();
+		updateSurface ();
+	}
+	public void updateNeighborCountThreshold(float newValue) {
+		neighborCountThreshold = (int) newValue;
+		updateDebug ();
+		updateSurface ();
+	}
+	private void updateSurface() {
+		surface.Recreate(FindSurfaceVertices (surfacePlane, surfacePlaneCenter, surfacePC));
+	}
+	private void updateDebug() {
+		debug.text = "Count = " + neighborCountThreshold + " and Distance = " + neighborDistanceThreshold;
+	}
+
 	void Update () {
 		if (Input.touchCount > 0)
 		{	
 			Touch touch = Input.GetTouch (0);
 			if (touch.phase == TouchPhase.Began && !EventSystem.current.IsPointerOverGameObject (touch.fingerId)) {
-				if (!CreateSurface (touch.position)) {
+				if (!CreateSurface (touch.position, tangoPointCloud)) {
 					debug.text = "Unable to find a surface. Please try again.";
 				}
 			}
@@ -43,13 +66,17 @@ public class TouchController : MonoBehaviour {
 //		}
 	}
 
-	private bool CreateSurface(Vector2 touch) {
+	private bool CreateSurface(Vector2 touch, TangoPointCloud pc) {
 		Vector3 planeCenter;
 		Plane plane;
-		if (tangoPointCloud.FindPlane (Camera.main, touch, out planeCenter, out plane)) {
-			var surfaceVertices = FindSurfaceVertices (plane, planeCenter);
+		if (pc.FindPlane (Camera.main, touch, out planeCenter, out plane)) {
+			var surfaceVertices = FindSurfaceVertices (plane, planeCenter, pc);
 			if (surfaceVertices.Count != 0) {
-				Surface surface = Instantiate (surfaceTemplate) as Surface;
+				surfacePC = pc; //For debugging
+				surfaceTP = touch;
+				surfacePlane = plane;
+				surfacePlaneCenter = planeCenter;
+				surface = Instantiate (surfaceTemplate) as Surface;
 				surface.Create (surfaceVertices, plane, planeCenter, brickMenu.GetCurrentMaterial ());
 				return true;
 			}
@@ -57,13 +84,13 @@ public class TouchController : MonoBehaviour {
 		return false;
 	}
 
-	private List<Vector3> FindSurfaceVertices(Plane plane, Vector3 planeCenter) {
+	private List<Vector3> FindSurfaceVertices(Plane plane, Vector3 planeCenter, TangoPointCloud pc) {
 		var verticesOnSurface = new List<Vector3> ();
 
 		//Step One: Narrow point cloud to points on the plane
 		var verticesOnPlane = new List<Vector3>();
-		for (int i = 0; i < tangoPointCloud.m_pointsCount; i++) {
-			var p = tangoPointCloud.m_points [i];
+		for (int i = 0; i < pc.m_pointsCount; i++) {
+			var p = pc.m_points [i];
 			if (Mathf.Abs (plane.GetDistanceToPoint (p)) <= planeDistanceThreshold) {
 				verticesOnPlane.Add (p);
 			}

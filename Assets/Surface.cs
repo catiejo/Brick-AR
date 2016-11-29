@@ -51,6 +51,13 @@ public class Surface : MonoBehaviour {
 		CreateMesh ();
 	}
 
+	public void Recreate(List<Vector3> worldVertices) {
+		_vertices = FindLocalVertices(worldVertices);
+		_triangles = FindTriangles ();
+		_uv = FindUV ();
+		CreateMesh ();
+	}
+
 	private void CreateMesh() {
 		Mesh mesh = new Mesh();
 		mesh.Clear();
