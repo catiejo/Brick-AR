@@ -8,9 +8,8 @@ using KDTree;
 
 public class TouchController : MonoBehaviour {
 	public MenuController brickMenu;
-	public Text debug; //For testing purposes
 	public int neighborCountThreshold = 15;
-	public float neighborDistanceThreshold = .05f;
+	public float neighborDistanceThreshold = 0.02f;
 	public float planeDistanceThreshold = 0.02f;
 	public Surface surfaceTemplate;
 	public TangoPointCloud tangoPointCloud;
@@ -26,21 +25,17 @@ public class TouchController : MonoBehaviour {
 		}
 	}
 
-	/*DEBUGGING SURFACE FINDING*/
-	public Surface surface;
-	private TangoPointCloud surfacePC;
+	/*DEBUGGING*/
+	public Text debug;
+	private Surface surface;
 	private Vector2 surfaceTP;
-	private Plane surfacePlane;
-	private Vector3 surfacePlaneCenter;
 	public void updateNeighborDistanceThreshold(float newValue) {
 		neighborDistanceThreshold = newValue;
-		updateDebug ();
-		updateSurface ();
+		Invoke("updateSurface", 1.0f);
 	}
 	public void updateNeighborCountThreshold(float newValue) {
 		neighborCountThreshold = (int) newValue;
-		updateDebug ();
-		updateSurface ();
+		Invoke("updateSurface", 1.0f);
 	}
 	private void updateSurface() {
 		surface.Recreate(FindSurfaceVertices (surfacePlane, surfacePlaneCenter, surfacePC));
@@ -49,12 +44,13 @@ public class TouchController : MonoBehaviour {
 		debug.text = "Count = " + neighborCountThreshold + " and Distance = " + neighborDistanceThreshold;
 	}
 
+
 	void Update () {
 		if (Input.touchCount > 0)
 		{	
 			Touch touch = Input.GetTouch (0);
 			if (touch.phase == TouchPhase.Began && !EventSystem.current.IsPointerOverGameObject (touch.fingerId)) {
-				if (!CreateSurface (touch.position, tangoPointCloud)) {
+				if (!CreateSurface (touch.position)) {
 					debug.text = "Unable to find a surface. Please try again.";
 				}
 			}
@@ -66,16 +62,13 @@ public class TouchController : MonoBehaviour {
 //		}
 	}
 
-	private bool CreateSurface(Vector2 touch, TangoPointCloud pc) {
+	private bool CreateSurface(Vector2 touch) {
 		Vector3 planeCenter;
 		Plane plane;
-		if (pc.FindPlane (Camera.main, touch, out planeCenter, out plane)) {
-			var surfaceVertices = FindSurfaceVertices (plane, planeCenter, pc);
+		if (tangoPointCloud.FindPlane (Camera.main, touch, out planeCenter, out plane)) {
+			var surfaceVertices = FindSurfaceVertices (plane, planeCenter);
 			if (surfaceVertices.Count != 0) {
-				surfacePC = pc; //For debugging
-				surfaceTP = touch;
-				surfacePlane = plane;
-				surfacePlaneCenter = planeCenter;
+				surfaceTP = touch; //For debugging
 				surface = Instantiate (surfaceTemplate) as Surface;
 				surface.Create (surfaceVertices, plane, planeCenter, brickMenu.GetCurrentMaterial ());
 				return true;
@@ -84,13 +77,13 @@ public class TouchController : MonoBehaviour {
 		return false;
 	}
 
-	private List<Vector3> FindSurfaceVertices(Plane plane, Vector3 planeCenter, TangoPointCloud pc) {
+	private List<Vector3> FindSurfaceVertices(Plane plane, Vector3 planeCenter) {
 		var verticesOnSurface = new List<Vector3> ();
 
 		//Step One: Narrow point cloud to points on the plane
 		var verticesOnPlane = new List<Vector3>();
-		for (int i = 0; i < pc.m_pointsCount; i++) {
-			var p = pc.m_points [i];
+		for (int i = 0; i < tangoPointCloud.m_pointsCount; i++) {
+			var p = tangoPointCloud.m_points [i];
 			if (Mathf.Abs (plane.GetDistanceToPoint (p)) <= planeDistanceThreshold) {
 				verticesOnPlane.Add (p);
 			}
@@ -104,9 +97,9 @@ public class TouchController : MonoBehaviour {
 		}
 
 		//Step Three: Breadth-first-style search for points on surface.
-		var pointsToCheck = new UniqueQueue<Point>();
+		var pointsToCheck = new Queue<Point>();
 		pointsToCheck.Enqueue (new Point(planeCenter));
-		while (!pointsToCheck.isEmpty()) {
+		while (!pointsToCheck.Count != 0) {
 			var currentPoint = pointsToCheck.Dequeue ();
 			var neighbors = kdTree.NearestNeighbors(currentPoint.doublePosition, neighborCountThreshold, neighborDistanceThreshold);
 			int neighborCount = 0;
