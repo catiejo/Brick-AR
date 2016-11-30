@@ -27,10 +27,18 @@ public class TouchController : MonoBehaviour {
 
 	/*DEBUGGING*/
 	public Text debug;
+	public Text nCount;
+	public Text nDistance;
+	public Text pDistance;
 	private Surface surface;
-	private Vector2 surfaceTP;
+	private Plane surfacePlane;
+	private Vector3 surfacePlaneCenter;
 	public void updateNeighborDistanceThreshold(float newValue) {
 		neighborDistanceThreshold = newValue;
+		Invoke("updateSurface", 1.0f);
+	}
+	public void updatePlaneDistanceThreshold(float newValue) {
+		planeDistanceThreshold = newValue;
 		Invoke("updateSurface", 1.0f);
 	}
 	public void updateNeighborCountThreshold(float newValue) {
@@ -38,10 +46,17 @@ public class TouchController : MonoBehaviour {
 		Invoke("updateSurface", 1.0f);
 	}
 	private void updateSurface() {
-		surface.Recreate(FindSurfaceVertices (surfacePlane, surfacePlaneCenter, surfacePC));
+		surface.Recreate(FindSurfaceVertices (surfacePlane, surfacePlaneCenter));
+		updateDebug ();
 	}
 	private void updateDebug() {
-		debug.text = "Count = " + neighborCountThreshold + " and Distance = " + neighborDistanceThreshold;
+		nCount.text = neighborCountThreshold.ToString();
+		nDistance.text = neighborDistanceThreshold.ToString ();
+		pDistance.text = planeDistanceThreshold.ToString();
+	}
+
+	void Awake() {
+		updateDebug ();
 	}
 
 
@@ -68,7 +83,8 @@ public class TouchController : MonoBehaviour {
 		if (tangoPointCloud.FindPlane (Camera.main, touch, out planeCenter, out plane)) {
 			var surfaceVertices = FindSurfaceVertices (plane, planeCenter);
 			if (surfaceVertices.Count != 0) {
-				surfaceTP = touch; //For debugging
+				surfacePlane = plane; //For debugging
+				surfacePlaneCenter = planeCenter; //For debugging
 				surface = Instantiate (surfaceTemplate) as Surface;
 				surface.Create (surfaceVertices, plane, planeCenter, brickMenu.GetCurrentMaterial ());
 				return true;
