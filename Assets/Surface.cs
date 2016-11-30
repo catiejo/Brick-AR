@@ -6,7 +6,6 @@ using System.Collections.Generic; //Lists
 using Tango;
 
 public class Surface : MonoBehaviour {
-	private Text debug;
 	private Plane _plane;
 	private Vector3 _planeCenter;
 	private Material _material;
@@ -29,11 +28,6 @@ public class Surface : MonoBehaviour {
 		}
 	}
 
-//	void Start() {
-//		debug = GameObject.FindWithTag ("Debug").GetComponent<Text>();
-//		debug.text = "surface created";
-//	}
-
 	public void Create(List<Vector3> worldVertices, Plane plane, Vector3 planeCenter, Material material) {
 		//Member variables
 		_plane = plane;
@@ -42,7 +36,7 @@ public class Surface : MonoBehaviour {
 		//Plane coordinate system
 		var xaxis = Quaternion.LookRotation(_plane.normal) * Vector3.right; //Horizontal vector transformed to plane's rotation
 		var yaxis = Vector3.Cross(xaxis, _plane.normal);
-		//Position plane
+		//Position + Rotation
 		transform.position = _planeCenter;
 		transform.rotation = Quaternion.LookRotation (_plane.normal, yaxis);
 		//Set up mesh
@@ -90,7 +84,7 @@ public class Surface : MonoBehaviour {
 			miVertex.Position = new double[3]{vertex.x, vertex.y, vertex.z};
 			miVertices.Add(miVertex);
 		}
-		//Generate convex hull + extract faces
+		//Generate convex hull + extract triangles
 		var hull = ConvexHull.Create(miVertices);
 		foreach (var face in hull.Faces)
 		{

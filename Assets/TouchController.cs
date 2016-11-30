@@ -8,11 +8,11 @@ using KDTree;
 
 public class TouchController : MonoBehaviour {
 	public MenuController brickMenu;
-	public int neighborCountThreshold = 15;
-	public float neighborDistanceThreshold = 0.02f;
-	public float planeDistanceThreshold = 0.02f;
 	public Surface surfaceTemplate;
 	public TangoPointCloud tangoPointCloud;
+	private int neighborCountThreshold = 11;
+	private float neighborDistanceThreshold = 0.0005f;
+	private float planeDistanceThreshold = 0.1f;
 	//Helper class for kdTree
 	public class Point : MonoBehaviour
 	{
