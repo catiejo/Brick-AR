@@ -35,16 +35,17 @@ public class Surface : MonoBehaviour {
 //	}
 
 	public void Create(List<Vector3> worldVertices, Plane plane, Vector3 planeCenter, Material material) {
-		//Define plane coordinate system
-		var xaxis = Quaternion.LookRotation (_plane.normal) * Vector3.right; //Horizontal vector transformed to plane's rotation
+		//Member variables
+		_plane = plane;
+		_planeCenter = planeCenter;
+		_material = material;
+		//Plane coordinate system
+		var xaxis = Quaternion.LookRotation(_plane.normal) * Vector3.right; //Horizontal vector transformed to plane's rotation
 		var yaxis = Vector3.Cross(xaxis, _plane.normal);
 		//Position plane
 		transform.position = _planeCenter;
 		transform.rotation = Quaternion.LookRotation (_plane.normal, yaxis);
 		//Set up mesh
-		_plane = plane;
-		_planeCenter = planeCenter;
-		_material = material;
 		_vertices = FindLocalVertices(worldVertices);
 		_triangles = FindTriangles ();
 		_uv = FindUV ();
