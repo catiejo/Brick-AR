@@ -10,9 +10,9 @@ public class TouchController : MonoBehaviour {
 	public MenuController brickMenu;
 	public Surface surfaceTemplate;
 	public TangoPointCloud tangoPointCloud;
-	private int neighborCountThreshold = 11;
-	private float neighborDistanceThreshold = 0.0005f;
-	private float planeDistanceThreshold = 0.1f;
+	private int neighborCountThreshold = 3;
+	private float neighborDistanceThreshold = 0.00015f;
+	private float planeDistanceThreshold = 0.05f;
 	//Helper class for kdTree
 	public class Point : MonoBehaviour
 	{
@@ -65,15 +65,11 @@ public class TouchController : MonoBehaviour {
 		{	
 			Touch touch = Input.GetTouch (0);
 			if (touch.phase == TouchPhase.Began && !EventSystem.current.IsPointerOverGameObject (touch.fingerId)) {
-				if (!CreateSurface (touch.position)) {
-					debug.text = "Unable to find a surface. Please try again.";
-				}
+				CreateSurface (touch.position);
 			}
 		}
 //		if (Input.GetMouseButtonDown (0)) {
-//			if (!CreateSurface (Input.mousePosition)) {
-//				depthText.text = "Unable to find a surface. Please try again.";
-//			}
+//			CreateSurface (Input.mousePosition);
 //		}
 	}
 
@@ -89,7 +85,10 @@ public class TouchController : MonoBehaviour {
 				surface.Create (surfaceVertices, plane, planeCenter, brickMenu.GetCurrentMaterial ());
 				return true;
 			}
+			debug.text = "No vertices found on the surface.";
+			return false;
 		}
+		debug.text = "No surface found.";
 		return false;
 	}
 
