@@ -99,7 +99,7 @@ public class TouchController : MonoBehaviour {
 		//Step Three: Breadth-first-style search for points on surface.
 		var pointsToCheck = new Queue<Point>();
 		pointsToCheck.Enqueue (new Point(planeCenter));
-		while (!pointsToCheck.Count != 0) {
+		while (pointsToCheck.Count != 0) {
 			var currentPoint = pointsToCheck.Dequeue ();
 			var neighbors = kdTree.NearestNeighbors(currentPoint.doublePosition, neighborCountThreshold, neighborDistanceThreshold);
 			int neighborCount = 0;
