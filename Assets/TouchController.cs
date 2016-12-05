@@ -10,9 +10,9 @@ public class TouchController : MonoBehaviour {
 	public MenuController brickMenu;
 	public Surface surfaceTemplate;
 	public TangoPointCloud tangoPointCloud;
-	private int neighborCountThreshold = 3;
-	private float neighborDistanceThreshold = 0.00015f;
-	private float planeDistanceThreshold = 0.05f;
+	private int neighborCountThreshold = 4;
+	private float neighborDistanceThreshold = 0.000175f;
+	private float planeDistanceThreshold = 0.075f;
 	//Helper class for kdTree
 	public class Point : MonoBehaviour
 	{
@@ -35,28 +35,28 @@ public class TouchController : MonoBehaviour {
 	private Vector3 surfacePlaneCenter;
 	public void updateNeighborDistanceThreshold(float newValue) {
 		neighborDistanceThreshold = newValue;
-		Invoke("updateSurface", 1.0f);
+		Invoke("updateSurface", 0.5f);
 	}
 	public void updatePlaneDistanceThreshold(float newValue) {
 		planeDistanceThreshold = newValue;
-		Invoke("updateSurface", 1.0f);
+		Invoke("updateSurface", 0.5f);
 	}
 	public void updateNeighborCountThreshold(float newValue) {
 		neighborCountThreshold = (int) newValue;
-		Invoke("updateSurface", 1.0f);
+		Invoke("updateSurface", 0.5f);
 	}
 	private void updateSurface() {
 		surface.Recreate(FindSurfaceVertices (surfacePlane, surfacePlaneCenter));
-		updateDebug ();
+		updateParamText ();
 	}
-	private void updateDebug() {
+	private void updateParamText() {
 		nCount.text = neighborCountThreshold.ToString();
 		nDistance.text = neighborDistanceThreshold.ToString ();
 		pDistance.text = planeDistanceThreshold.ToString();
 	}
 
 	void Awake() {
-		updateDebug ();
+		updateParamText ();
 	}
 
 
