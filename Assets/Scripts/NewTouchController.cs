@@ -18,12 +18,12 @@ public class NewTouchController : MonoBehaviour {
 	private bool hasStartPoint;
 
 	/* USEFUL FOR DEBUGGING */
-//	void Start() {
-//		var center = new Vector3(2, 3, 5);
-//		var plane = new Plane (Quaternion.Euler(30, 60, 70) * -Vector3.forward, center);
-//		NewSurface surface = Instantiate (surfaceTemplate) as NewSurface;
-//		surface.Create (plane, center + new Vector3(1, 1, 1), center + new Vector3(-1, -1, -1), center);
-//	}
+	void Start() {
+		var center = new Vector3(2, 3, 5);
+		var plane = new Plane (Quaternion.Euler(30, 60, 70) * -Vector3.forward, center);
+		NewSurface surface = Instantiate (surfaceTemplate) as NewSurface;
+		surface.Create (plane, center + new Vector3(1, 1, 1), center + new Vector3(-1, -1, -1), center);
+	}
 
 	void Update () {
 		if (Input.touchCount > 0)
