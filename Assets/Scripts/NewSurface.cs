@@ -16,11 +16,10 @@ public class NewSurface : MonoBehaviour {
 	private Color glowColor = Color.white;
 
 	void Start() {
-		Debug.LogWarning ("hello");
 		SelectSurface ();
 	}
 
-	public void Create(Plane plane, Vector3 topLeft, Vector3 bottomRight, Vector3 center) {
+	public void Create(Plane plane, Vector3 firstCorner, Vector3 oppositeCorner, Vector3 center) {
 		//Member variables
 		_center = center;
 		_plane = plane;
@@ -31,7 +30,7 @@ public class NewSurface : MonoBehaviour {
 		transform.position = _center;
 		transform.rotation = Quaternion.LookRotation (-_plane.normal, yaxis);
 		//Set up mesh
-		_vertices = FindCorners (topLeft, bottomRight);
+		_vertices = FindCorners (firstCorner, oppositeCorner);
 		_triangles = FindTriangles ();
 		_uv = FindUV ();
 		CreateMesh ();
@@ -56,11 +55,11 @@ public class NewSurface : MonoBehaviour {
 		GetComponent<MeshCollider>().sharedMesh = mesh;
 	}
 
-	private Vector3[] FindCorners(Vector3 topLeft, Vector3 bottomRight) {
+	private Vector3[] FindCorners(Vector3 firstCorner, Vector3 oppositeCorner) {
 		//Put vectors in local space
-		var corner1 = transform.InverseTransformPoint(topLeft);
+		var corner1 = transform.InverseTransformPoint(firstCorner);
 		corner1.z = 0;
-		var corner2 = transform.InverseTransformPoint(bottomRight);
+		var corner2 = transform.InverseTransformPoint(oppositeCorner);
 		corner2.z = 0;
 		//Find min/max coordinate values
 		var min = new Vector2(Mathf.Min(corner1.x, corner2.x), Mathf.Min(corner1.y, corner2.y));
@@ -115,7 +114,7 @@ public class NewSurface : MonoBehaviour {
 		// Setup
 		if (selectedSurface && selectedSurface != this) {
 			selectedSurface.DeselectSurface ();
-			yield return new WaitForSeconds(0.01f); //HACK in case same surface is selected twice
+			yield return new WaitForSeconds(0.01f); //HACK in case same surface is re-selected
 		}
 		Material material = gameObject.GetComponent<Renderer>().material;
 		material.EnableKeyword("_EMISSION");

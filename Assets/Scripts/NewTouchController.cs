@@ -11,21 +11,17 @@ public class NewTouchController : MonoBehaviour {
 	public GameObject line;
 	public NewSurface surfaceTemplate;
 	public TangoPointCloud tangoPointCloud;
-	private Vector3 topLeft;
-	private Vector3 bottomRight;
+	private Vector3 firstCorner;
+	private Vector3 oppositeCorner;
 	private bool hasStartPoint;
 
 	/* USEFUL FOR DEBUGGING */
-	void Start() {
-//		var center = new Vector3(2, 3, 5);
+//	void Start() {
+//		var center = new Vector3(1, 1, 1);
 //		var plane = new Plane (Quaternion.Euler(30, 60, 70) * -Vector3.forward, center);
 //		NewSurface surface = Instantiate (surfaceTemplate) as NewSurface;
 //		surface.Create (plane, center + new Vector3(1, 1, 1), center + new Vector3(-1, -1, -1), center);
-		var center = new Vector3(1, 1, 1);
-		var plane = new Plane (Quaternion.Euler(30, 60, 70) * -Vector3.forward, center);
-		NewSurface surface = Instantiate (surfaceTemplate) as NewSurface;
-		surface.Create (plane, center + new Vector3(1, 1, 1), center + new Vector3(-1, -1, -1), center);
-	}
+//	}
 
 	void Update () {
 		if (Input.touchCount > 0)
@@ -36,11 +32,11 @@ public class NewTouchController : MonoBehaviour {
 			if (closestPointIndex != -1) {
 				if (!hasStartPoint) {
 					StartLine (closestPoint);
-					topLeft = closestPoint;
+					firstCorner = closestPoint;
 					hasStartPoint = true;
 				}
 				ExtendLine (closestPoint);
-				bottomRight = closestPoint;
+				oppositeCorner = closestPoint;
 			}
 			if (touch.phase == TouchPhase.Ended) {
 				line.SetActive(false);
@@ -50,9 +46,9 @@ public class NewTouchController : MonoBehaviour {
 				}
 			}
 		}
-		if (Input.GetMouseButtonDown(0)) {
-			TrySelectSurface (Input.mousePosition);
-		}
+		/* USEFUL FOR DEBUGGING */
+//		if (Input.GetMouseButtonDown(0)) {
+//		}
 	}
 
 	private void StartLine(Vector3 start)
@@ -70,7 +66,7 @@ public class NewTouchController : MonoBehaviour {
 	}
 
 	private void HandleTouch(Vector2 position) {
-		var diagonal = topLeft - bottomRight;
+		var diagonal = firstCorner - oppositeCorner;
 		if (diagonal.magnitude < 0.05f) { //Surface not big enough; could also be a UI tap
 			if (!TrySelectSurface (position)) {
 				debug.text = "Unable to select the surface. Please try selecting a different point.";
@@ -84,9 +80,9 @@ public class NewTouchController : MonoBehaviour {
 		Vector3 planeCenter;
 		Plane plane;
 
-		float lerpOffset = -0.25f; //must be negative
+		float lerpOffset = -0.25f; //Must be negative to start
 		float lerpAmount = 0.5f;
-		Vector3 center = Vector3.Lerp (topLeft, bottomRight, lerpAmount);
+		Vector3 center = Vector3.Lerp (firstCorner, oppositeCorner, lerpAmount);
 		//Search for plane along diagonal, fanning out from center
 		while (!tangoPointCloud.FindPlane (Camera.main, Camera.main.WorldToScreenPoint(center), out planeCenter, out plane)) {
 			if (Mathf.Abs (lerpOffset) >= 0.5) {
@@ -97,10 +93,10 @@ public class NewTouchController : MonoBehaviour {
 				lerpOffset *= -1;
 			}
 			lerpAmount = 0.5f + lerpOffset;
-			center = Vector3.Lerp (topLeft, bottomRight, lerpAmount);
+			center = Vector3.Lerp (firstCorner, oppositeCorner, lerpAmount);
 		}
 		NewSurface surface = Instantiate (surfaceTemplate) as NewSurface;
-		surface.Create (plane, topLeft, bottomRight, planeCenter);
+		surface.Create (plane, firstCorner, oppositeCorner, planeCenter);
 		return true;
 	}
 
