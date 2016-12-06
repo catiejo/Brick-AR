@@ -36,15 +36,14 @@ public class NewTouchController : MonoBehaviour {
 					StartLine (closestPoint);
 					topLeft = closestPoint;
 					hasStartPoint = true;
-				} else if (touch.phase == TouchPhase.Moved) {
-					ExtendLine (closestPoint);
 				}
+				ExtendLine (closestPoint);
+				bottomRight = closestPoint;
 			}
 			if (touch.phase == TouchPhase.Ended) {
 				line.SetActive(false);
-				hasStartPoint = false;
-				if (closestPointIndex != -1) {
-					bottomRight = closestPoint;
+				if (hasStartPoint) {
+					hasStartPoint = false;
 					CreateSurface ();
 				}
 			}
@@ -55,8 +54,6 @@ public class NewTouchController : MonoBehaviour {
 	{
 		line.transform.position = start;
 		LineRenderer lr = line.GetComponent<LineRenderer>();
-		lr.SetColors(Color.cyan, Color.cyan);
-		lr.SetWidth(0.01f, 0.01f);
 		lr.SetPosition(0, start);
 		lr.SetPosition(1, start);
 		line.SetActive(true);
@@ -69,11 +66,14 @@ public class NewTouchController : MonoBehaviour {
 	}
 
 	private bool CreateSurface() {
+		if (topLeft == bottomRight) {
+			return false;
+		}
 		Vector3 center = Vector3.Lerp (topLeft, bottomRight, 0.5f);
 		Vector3 planeCenter;
 		Plane plane;
 		if (tangoPointCloud.FindPlane (Camera.main, Camera.main.WorldToScreenPoint(center), out planeCenter, out plane)) {
-			debug.text = "Found a midpoint!";
+//			debug.text = "Found a midpoint!";
 			NewSurface surface = Instantiate (surfaceTemplate) as NewSurface;
 			surface.Create (plane, topLeft, bottomRight, planeCenter);
 			return true;

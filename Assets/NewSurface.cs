@@ -15,27 +15,29 @@ public class NewSurface : MonoBehaviour {
 	public NewMenuController menuTemplate;
 	public Material defaultMaterial;
 	private NewMenuController _surfaceOptions;
+	public static NewSurface selectedSurface;
+
+//	void Update() {
+//		if (_surfaceOptions.HasColor ()) {
+//			_material = _surfaceOptions.GetCurrentMaterial ();
+//		}
+//	}
+
+	void Start() {
+		selectedSurface = this;
+	}
 
 	public void Create(Plane plane, Vector3 topLeft, Vector3 bottomRight, Vector3 center) {
 		//Member variables
 		_center = center;
 		_plane = plane;
+		_material = defaultMaterial;
 		//Plane coordinate system
 		var xaxis = Quaternion.LookRotation(-_plane.normal) * Vector3.right; //Horizontal vector transformed to plane's rotation
 		var yaxis = Vector3.Cross(xaxis, _plane.normal);
 		//Position + Rotation
 		transform.position = _center;
 		transform.rotation = Quaternion.LookRotation (-_plane.normal, yaxis);
-
-		Debug.LogWarning ("X: " + xaxis.ToString ());
-		Debug.LogWarning ("Y: " + yaxis.ToString ());
-		Debug.LogWarning ("N: " + _plane.normal.ToString ());
-		Debug.DrawLine(transform.position, transform.position + xaxis, Color.red, 10000);
-		Debug.DrawLine(transform.position, transform.position + yaxis, Color.blue, 10000);
-		Debug.DrawLine (_center, topLeft, Color.yellow, 1000);
-		Debug.DrawLine (_center, bottomRight, Color.magenta, 1000);
-		Debug.DrawLine (_center, _center + 	plane.normal, Color.green, 1000);
-
 		//Set up mesh
 		_vertices = FindCorners (topLeft, bottomRight);
 		_triangles = FindTriangles ();
@@ -62,8 +64,6 @@ public class NewSurface : MonoBehaviour {
 		topLeftCorner.z = 0;
 		var bottomRightCorner = transform.InverseTransformPoint(bottomRight);
 		bottomRightCorner.z = 0;
-		Debug.DrawLine (_center, transform.TransformPoint(topLeftCorner), Color.cyan, 1000);
-		Debug.DrawLine (_center, transform.TransformPoint(bottomRightCorner), Color.gray, 1000);
 
 		var corners = new Vector3[4];
 
@@ -93,10 +93,10 @@ public class NewSurface : MonoBehaviour {
 	private Vector2[] FindUV() {
 		var uv = new Vector2[4];
 
-		uv[0] = _vertices[0];
-		uv[1] = _vertices[1];
-		uv[2] = _vertices[2];
-		uv[3] = _vertices[3];
+		uv[0] = _vertices[0] * 2.0f;
+		uv[1] = _vertices[1] * 2.0f;
+		uv[2] = _vertices[2] * 2.0f;
+		uv[3] = _vertices[3] * 2.0f;
 
 		return uv;
 	}

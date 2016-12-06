@@ -48,7 +48,7 @@ public class MenuController : MonoBehaviour {
 
 	private void ExpandMenu() {
 		if (!_isAlreadyOpen) {
-			gameObject.GetComponent<Animation> ().Play ("spiral-out");
+			gameObject.GetComponent<Animation> ().Play ("expand-picker");
 		}
 		_isAlreadyOpen = true;
 	}
