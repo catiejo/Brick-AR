@@ -69,16 +69,28 @@ public class NewTouchController : MonoBehaviour {
 		if (diagonal.magnitude < 0.01f) {
 			return false; //Surface not big enough; could also be a UI tap
 		}
-		Vector3 center = Vector3.Lerp (topLeft, bottomRight, 0.5f);
 		Vector3 planeCenter;
 		Plane plane;
-		if (tangoPointCloud.FindPlane (Camera.main, Camera.main.WorldToScreenPoint(center), out planeCenter, out plane)) {
-			NewSurface surface = Instantiate (surfaceTemplate) as NewSurface;
-			surface.Create (plane, topLeft, bottomRight, planeCenter);
-			return true;
+
+		float lerpOffset = -0.25f;
+		float lerpAmount = 0.5f;
+		Vector3 center = Vector3.Lerp (topLeft, bottomRight, lerpAmount);
+		//Try to find the plane
+		while (!tangoPointCloud.FindPlane (Camera.main, Camera.main.WorldToScreenPoint(center), out planeCenter, out plane)) {
+			if (Mathf.Abs (lerpOffset) >= 0.5) {
+				debug.text = "No surface found. Please try again.";
+				return false;
+			} else if (lerpOffset > 0) {
+				lerpOffset += 0.1f;
+				lerpOffset *= -1;
+			}
+			lerpAmount = 0.5f + lerpOffset;
+			center = Vector3.Lerp (topLeft, bottomRight, lerpAmount);
 		}
-		debug.text = "Please try again.";
-		return false;
+		debug.text = "Found plane at " + lerpAmount;
+		NewSurface surface = Instantiate (surfaceTemplate) as NewSurface;
+		surface.Create (plane, topLeft, bottomRight, planeCenter);
+		return true;
 	}
 
 }
