@@ -17,12 +17,6 @@ public class NewSurface : MonoBehaviour {
 	private NewMenuController _surfaceOptions;
 	public static NewSurface selectedSurface;
 
-//	void Update() {
-//		if (_surfaceOptions.HasColor ()) {
-//			_material = _surfaceOptions.GetCurrentMaterial ();
-//		}
-//	}
-
 	void Start() {
 		selectedSurface = this;
 	}

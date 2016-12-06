@@ -5,7 +5,7 @@ using System.Collections;
 public class NewMenuController : MonoBehaviour {
 	private NewSurface _trackedSurface;
 	public Material[] brickMaterials;
-	private int _currentMaterial = -1;
+	private int _currentMaterial = 0; //defaults to beige
 
 	public Material GetCurrentMaterial () {
 		return brickMaterials [_currentMaterial];
@@ -14,10 +14,6 @@ public class NewMenuController : MonoBehaviour {
 	void Start() {
 		gameObject.GetComponent<Animation> ().Play ("spiral-in");
 	}
-
-//	public bool HasColor() {
-//		return _currentMaterial != -1;
-//	}
 
 	public void Update() {
 		if (_trackedSurface) {
@@ -32,6 +28,9 @@ public class NewMenuController : MonoBehaviour {
 	public void SelectOption(string option) {
 		//NOTE: indices need to match order of items in brickMaterials (e.g. beige material is located at index 0)
 		switch (option) {
+			case "Delete":
+				Destroy (_trackedSurface);
+				break;
 			case "Beige":
 				_currentMaterial = 0;
 				break;
@@ -44,16 +43,17 @@ public class NewMenuController : MonoBehaviour {
 			case "Yellow":
 				_currentMaterial = 3;
 				break;
-//			case "Delete":
-//				break;
 		}
-		_trackedSurface.SetMaterial (GetCurrentMaterial());
-//		NewSurface.selectedSurface.SetMaterial (GetCurrentMaterial());
-		gameObject.GetComponent<Animation> ().Play ("spiral-in");
+		CollapseMenu ();
 	}
 
 	public void ExpandMenu() {
 		gameObject.GetComponent<Animation> ().Play ("spiral-out");
+	}
+
+	private void CollapseMenu() {
+		_trackedSurface.SetMaterial (GetCurrentMaterial());
+		gameObject.GetComponent<Animation> ().Play ("spiral-in");
 	}
 }
 

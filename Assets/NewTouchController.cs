@@ -17,6 +17,7 @@ public class NewTouchController : MonoBehaviour {
 	public GameObject line;
 	private bool hasStartPoint;
 
+	/* USEFUL FOR DEBUGGING */
 //	void Start() {
 //		var center = new Vector3(2, 3, 5);
 //		var plane = new Plane (Quaternion.Euler(30, 60, 70) * -Vector3.forward, center);
@@ -31,7 +32,6 @@ public class NewTouchController : MonoBehaviour {
 			int closestPointIndex = tangoPointCloud.FindClosestPoint (Camera.main, touch.position, 500);
 			Vector3 closestPoint = tangoPointCloud.m_points [closestPointIndex];
 			if (closestPointIndex != -1) {
-				debug.text = "Closest point is: " + closestPoint.ToString ();
 				if (!hasStartPoint) {
 					StartLine (closestPoint);
 					topLeft = closestPoint;
@@ -57,7 +57,6 @@ public class NewTouchController : MonoBehaviour {
 		lr.SetPosition(0, start);
 		lr.SetPosition(1, start);
 		line.SetActive(true);
-
 	}
 
 	private void ExtendLine(Vector3 end) {
@@ -66,14 +65,14 @@ public class NewTouchController : MonoBehaviour {
 	}
 
 	private bool CreateSurface() {
-		if (topLeft == bottomRight) {
-			return false;
+		var diagonal = topLeft - bottomRight;
+		if (diagonal.magnitude < 0.01f) {
+			return false; //Surface not big enough; could also be a UI tap
 		}
 		Vector3 center = Vector3.Lerp (topLeft, bottomRight, 0.5f);
 		Vector3 planeCenter;
 		Plane plane;
 		if (tangoPointCloud.FindPlane (Camera.main, Camera.main.WorldToScreenPoint(center), out planeCenter, out plane)) {
-//			debug.text = "Found a midpoint!";
 			NewSurface surface = Instantiate (surfaceTemplate) as NewSurface;
 			surface.Create (plane, topLeft, bottomRight, planeCenter);
 			return true;
