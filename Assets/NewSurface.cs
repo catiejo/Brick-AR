@@ -6,16 +6,12 @@ using System.Collections.Generic; //Lists
 using Tango;
 
 public class NewSurface : MonoBehaviour {
-	private Plane _plane;
+	public static NewSurface selectedSurface;
 	private Vector3 _center;
-	private Material _material;
+	private Plane _plane;
 	private int[] _triangles;
 	private Vector2[] _uv;
 	private Vector3[] _vertices;
-	public NewMenuController menuTemplate;
-	public Material defaultMaterial;
-	private NewMenuController _surfaceOptions;
-	public static NewSurface selectedSurface;
 
 	void Start() {
 		selectedSurface = this;
@@ -25,7 +21,6 @@ public class NewSurface : MonoBehaviour {
 		//Member variables
 		_center = center;
 		_plane = plane;
-		_material = defaultMaterial;
 		//Plane coordinate system
 		var xaxis = Quaternion.LookRotation(-_plane.normal) * Vector3.right; //Horizontal vector transformed to plane's rotation
 		var yaxis = Vector3.Cross(xaxis, _plane.normal);
@@ -54,17 +49,21 @@ public class NewSurface : MonoBehaviour {
 	}
 
 	private Vector3[] FindCorners(Vector3 topLeft, Vector3 bottomRight) {
-		var topLeftCorner = transform.InverseTransformPoint(topLeft);
-		topLeftCorner.z = 0;
-		var bottomRightCorner = transform.InverseTransformPoint(bottomRight);
-		bottomRightCorner.z = 0;
+		//Put vectors in local space
+		var corner1 = transform.InverseTransformPoint(topLeft);
+		corner1.z = 0;
+		var corner2 = transform.InverseTransformPoint(bottomRight);
+		corner2.z = 0;
+		//Find min/max coordinate values
+		var min = new Vector2(Mathf.Min(corner1.x, corner2.x), Mathf.Min(corner1.y, corner2.y));
+		var max = new Vector2(Mathf.Max(corner1.x, corner2.x), Mathf.Max(corner1.y, corner2.y));
 
 		var corners = new Vector3[4];
 
-		corners[0] = new Vector3(topLeftCorner.x, bottomRightCorner.y, 0); //bottom left
-		corners[1] = bottomRightCorner; //bottom right
-		corners[2] = topLeftCorner; //top left
-		corners[3] = new Vector3(bottomRightCorner.x, topLeftCorner.y, 0); //top right
+		corners[0] = new Vector3(min.x, min.y, 0); //bottom left
+		corners[1] = new Vector3(max.x, min.y, 0); //bottom right
+		corners[2] = new Vector3(min.x, max.y, 0); //top left
+		corners[3] = new Vector3(max.x, max.y, 0); //top right
 
 		return corners;
 	}
@@ -87,10 +86,10 @@ public class NewSurface : MonoBehaviour {
 	private Vector2[] FindUV() {
 		var uv = new Vector2[4];
 
-		uv[0] = _vertices[0] * 2.0f;
-		uv[1] = _vertices[1] * 2.0f;
-		uv[2] = _vertices[2] * 2.0f;
-		uv[3] = _vertices[3] * 2.0f;
+		uv[0] = _vertices[0] * 3.0f;
+		uv[1] = _vertices[1] * 3.0f;
+		uv[2] = _vertices[2] * 3.0f;
+		uv[3] = _vertices[3] * 3.0f;
 
 		return uv;
 	}
