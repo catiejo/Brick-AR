@@ -16,7 +16,7 @@ public class NewMenuController : MonoBehaviour {
 		if (_trackedSurface) {
 			transform.position = Camera.main.WorldToScreenPoint(_trackedSurface.transform.position);
 		}
-		if (_trackedSurface != NewSurface.selectedSurface) {
+		if (NewSurface.selectedSurface && _trackedSurface != NewSurface.selectedSurface) {
 			_trackedSurface = NewSurface.selectedSurface;
 			ExpandMenu ();
 		}
@@ -52,6 +52,7 @@ public class NewMenuController : MonoBehaviour {
 		if (_trackedSurface) {
 			_trackedSurface.SetMaterial (GetCurrentMaterial ());
 			_trackedSurface.DeselectSurface ();
+			_trackedSurface = null;
 		}
 		gameObject.GetComponent<Animation> ().Play ("spiral-in");
 	}

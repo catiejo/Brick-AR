@@ -114,34 +114,33 @@ public class NewSurface : MonoBehaviour {
 	{
 		// Setup
 		if (selectedSurface && selectedSurface != this) {
-			selectedSurface.DeselectSurface (); //turn off surface glow
+			selectedSurface.DeselectSurface ();
+			yield return new WaitForSeconds(0.01f); //HACK in case same surface is selected twice
 		}
-		Debug.LogWarning ("start select");
-		selectedSurface = this;
 		Material material = gameObject.GetComponent<Renderer>().material;
 		material.EnableKeyword("_EMISSION");
 		material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
 		// Increase intensity (fade in)
-		glowAmount = 0.0f;
 		while (glowAmount < 0.5)
 		{
 			material.SetColor("_EmissionColor", glowColor * glowAmount);
 			glowAmount += 0.01f;
 			yield return new WaitForSeconds(0.01f);
 		}
+		selectedSurface = this;
 	}
 
 	private IEnumerator Deselect() {
-		Debug.LogWarning ("start deselect");
+		selectedSurface = null; //DO NOT MOVE (see hack in Select())
 		Material material = gameObject.GetComponent<Renderer>().material;
 		// Increase intensity (fade in)
-		glowAmount = 0.5f;
 		while (glowAmount > 0)
 		{
 			material.SetColor("_EmissionColor", glowColor * glowAmount);
 			glowAmount -= 0.01f;
 			yield return new WaitForSeconds(0.01f);
 		}
+		glowAmount = 0; //to account for rounding error
 		// Cleanup
 		material.DisableKeyword("_EMISSION");
 		material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack;
