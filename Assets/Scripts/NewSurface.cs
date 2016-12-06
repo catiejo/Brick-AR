@@ -12,9 +12,12 @@ public class NewSurface : MonoBehaviour {
 	private int[] _triangles;
 	private Vector2[] _uv;
 	private Vector3[] _vertices;
+	private float glowAmount;
+	private Color glowColor = Color.white;
 
 	void Start() {
-		selectedSurface = this;
+		Debug.LogWarning ("hello");
+		SelectSurface ();
 	}
 
 	public void Create(Plane plane, Vector3 topLeft, Vector3 bottomRight, Vector3 center) {
@@ -49,7 +52,8 @@ public class NewSurface : MonoBehaviour {
 		mesh.vertices = _vertices;
 		mesh.uv = _uv;
 		mesh.triangles = _triangles;
-		GetComponent<MeshFilter>().mesh = mesh;
+		GetComponent<MeshFilter>().mesh = mesh; //should this also be sharedMesh?
+		GetComponent<MeshCollider>().sharedMesh = mesh;
 	}
 
 	private Vector3[] FindCorners(Vector3 topLeft, Vector3 bottomRight) {
@@ -97,5 +101,52 @@ public class NewSurface : MonoBehaviour {
 
 		return uv;
 	}
+		
+	public void SelectSurface() {
+		StartCoroutine (Select ());
+	}
+
+	public void DeselectSurface() {
+		StartCoroutine (Deselect ());
+	}
+
+	private IEnumerator Select()
+	{
+		// Setup
+		if (selectedSurface && selectedSurface != this) {
+			selectedSurface.DeselectSurface (); //turn off surface glow
+		}
+		Debug.LogWarning ("start select");
+		selectedSurface = this;
+		Material material = gameObject.GetComponent<Renderer>().material;
+		material.EnableKeyword("_EMISSION");
+		material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
+		// Increase intensity (fade in)
+		glowAmount = 0.0f;
+		while (glowAmount < 0.5)
+		{
+			material.SetColor("_EmissionColor", glowColor * glowAmount);
+			glowAmount += 0.01f;
+			yield return new WaitForSeconds(0.01f);
+		}
+	}
+
+	private IEnumerator Deselect() {
+		Debug.LogWarning ("start deselect");
+		Material material = gameObject.GetComponent<Renderer>().material;
+		// Increase intensity (fade in)
+		glowAmount = 0.5f;
+		while (glowAmount > 0)
+		{
+			material.SetColor("_EmissionColor", glowColor * glowAmount);
+			glowAmount -= 0.01f;
+			yield return new WaitForSeconds(0.01f);
+		}
+		// Cleanup
+		material.DisableKeyword("_EMISSION");
+		material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack;
+		material.SetColor("_EmissionColor", Color.black);
+	}
+
 
 }

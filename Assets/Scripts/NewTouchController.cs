@@ -16,12 +16,16 @@ public class NewTouchController : MonoBehaviour {
 	private bool hasStartPoint;
 
 	/* USEFUL FOR DEBUGGING */
-//	void Start() {
+	void Start() {
 //		var center = new Vector3(2, 3, 5);
 //		var plane = new Plane (Quaternion.Euler(30, 60, 70) * -Vector3.forward, center);
 //		NewSurface surface = Instantiate (surfaceTemplate) as NewSurface;
 //		surface.Create (plane, center + new Vector3(1, 1, 1), center + new Vector3(-1, -1, -1), center);
-//	}
+		var center = new Vector3(1, 1, 1);
+		var plane = new Plane (Quaternion.Euler(30, 60, 70) * -Vector3.forward, center);
+		NewSurface surface = Instantiate (surfaceTemplate) as NewSurface;
+		surface.Create (plane, center + new Vector3(1, 1, 1), center + new Vector3(-1, -1, -1), center);
+	}
 
 	void Update () {
 		if (Input.touchCount > 0)
@@ -42,9 +46,12 @@ public class NewTouchController : MonoBehaviour {
 				line.SetActive(false);
 				if (hasStartPoint) {
 					hasStartPoint = false;
-					CreateSurface ();
+					HandleTouch (touch.position);
 				}
 			}
+		}
+		if (Input.GetMouseButtonDown(0)) {
+			TrySelectSurface (Input.mousePosition);
 		}
 	}
 
@@ -62,11 +69,18 @@ public class NewTouchController : MonoBehaviour {
 		lr.SetPosition(1, end);
 	}
 
-	private bool CreateSurface() {
+	private void HandleTouch(Vector2 position) {
 		var diagonal = topLeft - bottomRight;
-		if (diagonal.magnitude < 0.05f) {
-			return false; //Surface not big enough; could also be a UI tap
+		if (diagonal.magnitude < 0.05f) { //Surface not big enough; could also be a UI tap
+			if (!TrySelectSurface (position)) {
+				debug.text = "Unable to select the surface. Please try selecting a different point.";
+			}
+		} else {
+			CreateSurface ();
 		}
+	}
+
+	private bool CreateSurface() {
 		Vector3 planeCenter;
 		Plane plane;
 
@@ -88,6 +102,20 @@ public class NewTouchController : MonoBehaviour {
 		NewSurface surface = Instantiate (surfaceTemplate) as NewSurface;
 		surface.Create (plane, topLeft, bottomRight, planeCenter);
 		return true;
+	}
+
+	private bool TrySelectSurface(Vector2 touch) {
+		RaycastHit hit;
+		var ray = Camera.main.ScreenPointToRay (touch);
+		if(Physics.Raycast(ray.origin, ray.direction, out hit))
+		{
+			NewSurface selected = hit.collider.gameObject.GetComponent<NewSurface> ();
+			if (selected != null) {
+				selected.SelectSurface ();
+				return true;
+			}
+		}
+		return false;
 	}
 
 }

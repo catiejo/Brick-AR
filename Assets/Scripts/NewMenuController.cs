@@ -51,6 +51,7 @@ public class NewMenuController : MonoBehaviour {
 	private void CollapseMenu() {
 		if (_trackedSurface) {
 			_trackedSurface.SetMaterial (GetCurrentMaterial ());
+			_trackedSurface.DeselectSurface ();
 		}
 		gameObject.GetComponent<Animation> ().Play ("spiral-in");
 	}
