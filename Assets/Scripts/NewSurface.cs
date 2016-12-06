@@ -7,13 +7,13 @@ using Tango;
 
 public class NewSurface : MonoBehaviour {
 	public static NewSurface selectedSurface;
+	public Color glowColor = Color.white;
 	private Vector3 _center;
 	private Plane _plane;
+	private float _glowAmount;
 	private int[] _triangles;
 	private Vector2[] _uv;
 	private Vector3[] _vertices;
-	private float glowAmount;
-	private Color glowColor = Color.white;
 
 	void Start() {
 		SelectSurface ();
@@ -120,10 +120,10 @@ public class NewSurface : MonoBehaviour {
 		material.EnableKeyword("_EMISSION");
 		material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
 		// Increase intensity (fade in)
-		while (glowAmount < 0.5)
+		while (_glowAmount < 0.5)
 		{
-			material.SetColor("_EmissionColor", glowColor * glowAmount);
-			glowAmount += 0.01f;
+			material.SetColor("_EmissionColor", glowColor * _glowAmount);
+			_glowAmount += 0.01f;
 			yield return new WaitForSeconds(0.01f);
 		}
 		selectedSurface = this;
@@ -133,18 +133,16 @@ public class NewSurface : MonoBehaviour {
 		selectedSurface = null; //DO NOT MOVE (see hack in Select())
 		Material material = gameObject.GetComponent<Renderer>().material;
 		// Increase intensity (fade in)
-		while (glowAmount > 0)
+		while (_glowAmount > 0)
 		{
-			material.SetColor("_EmissionColor", glowColor * glowAmount);
-			glowAmount -= 0.01f;
+			material.SetColor("_EmissionColor", glowColor * _glowAmount);
+			_glowAmount -= 0.01f;
 			yield return new WaitForSeconds(0.01f);
 		}
-		glowAmount = 0; //to account for rounding error
+		_glowAmount = 0; //to account for rounding error
 		// Cleanup
 		material.DisableKeyword("_EMISSION");
 		material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack;
 		material.SetColor("_EmissionColor", Color.black);
 	}
-
-
 }
