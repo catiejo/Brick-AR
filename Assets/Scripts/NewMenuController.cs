@@ -3,16 +3,13 @@ using UnityEngine.UI;
 using System.Collections;
 
 public class NewMenuController : MonoBehaviour {
+	public Text debug;
 	private NewSurface _trackedSurface;
 	public Material[] brickMaterials;
 	private int _currentMaterial = 0; //defaults to beige
 
 	public Material GetCurrentMaterial () {
 		return brickMaterials [_currentMaterial];
-	}
-
-	void Start() {
-		gameObject.GetComponent<Animation> ().Play ("spiral-in");
 	}
 
 	public void Update() {
@@ -29,7 +26,7 @@ public class NewMenuController : MonoBehaviour {
 		//NOTE: indices need to match order of items in brickMaterials (e.g. beige material is located at index 0)
 		switch (option) {
 			case "Delete":
-				Destroy (_trackedSurface);
+				_trackedSurface.Undo();
 				break;
 			case "Beige":
 				_currentMaterial = 0;
@@ -52,7 +49,9 @@ public class NewMenuController : MonoBehaviour {
 	}
 
 	private void CollapseMenu() {
-		_trackedSurface.SetMaterial (GetCurrentMaterial());
+		if (_trackedSurface) {
+			_trackedSurface.SetMaterial (GetCurrentMaterial ());
+		}
 		gameObject.GetComponent<Animation> ().Play ("spiral-in");
 	}
 }

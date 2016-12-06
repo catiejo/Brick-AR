@@ -38,6 +38,10 @@ public class NewSurface : MonoBehaviour {
 		GetComponent<MeshRenderer> ().material = material;
 	}
 
+	public void Undo() {
+		DestroyImmediate (gameObject);
+	}
+
 	private void CreateMesh() {
 		Mesh mesh = new Mesh();
 		mesh.Clear();

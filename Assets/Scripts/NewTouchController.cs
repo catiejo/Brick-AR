@@ -8,22 +8,20 @@ using KDTree;
 
 public class NewTouchController : MonoBehaviour {
 	public Text debug;
-//	public MenuController brickMenu;
+	public GameObject line;
 	public NewSurface surfaceTemplate;
 	public TangoPointCloud tangoPointCloud;
 	private Vector3 topLeft;
 	private Vector3 bottomRight;
-	private bool isDragging;
-	public GameObject line;
 	private bool hasStartPoint;
 
 	/* USEFUL FOR DEBUGGING */
-	void Start() {
-		var center = new Vector3(2, 3, 5);
-		var plane = new Plane (Quaternion.Euler(30, 60, 70) * -Vector3.forward, center);
-		NewSurface surface = Instantiate (surfaceTemplate) as NewSurface;
-		surface.Create (plane, center + new Vector3(1, 1, 1), center + new Vector3(-1, -1, -1), center);
-	}
+//	void Start() {
+//		var center = new Vector3(2, 3, 5);
+//		var plane = new Plane (Quaternion.Euler(30, 60, 70) * -Vector3.forward, center);
+//		NewSurface surface = Instantiate (surfaceTemplate) as NewSurface;
+//		surface.Create (plane, center + new Vector3(1, 1, 1), center + new Vector3(-1, -1, -1), center);
+//	}
 
 	void Update () {
 		if (Input.touchCount > 0)
@@ -66,16 +64,16 @@ public class NewTouchController : MonoBehaviour {
 
 	private bool CreateSurface() {
 		var diagonal = topLeft - bottomRight;
-		if (diagonal.magnitude < 0.01f) {
+		if (diagonal.magnitude < 0.05f) {
 			return false; //Surface not big enough; could also be a UI tap
 		}
 		Vector3 planeCenter;
 		Plane plane;
 
-		float lerpOffset = -0.25f;
+		float lerpOffset = -0.25f; //must be negative
 		float lerpAmount = 0.5f;
 		Vector3 center = Vector3.Lerp (topLeft, bottomRight, lerpAmount);
-		//Try to find the plane
+		//Search for plane along diagonal, fanning out from center
 		while (!tangoPointCloud.FindPlane (Camera.main, Camera.main.WorldToScreenPoint(center), out planeCenter, out plane)) {
 			if (Mathf.Abs (lerpOffset) >= 0.5) {
 				debug.text = "No surface found. Please try again.";
@@ -87,7 +85,6 @@ public class NewTouchController : MonoBehaviour {
 			lerpAmount = 0.5f + lerpOffset;
 			center = Vector3.Lerp (topLeft, bottomRight, lerpAmount);
 		}
-		debug.text = "Found plane at " + lerpAmount;
 		NewSurface surface = Instantiate (surfaceTemplate) as NewSurface;
 		surface.Create (plane, topLeft, bottomRight, planeCenter);
 		return true;
