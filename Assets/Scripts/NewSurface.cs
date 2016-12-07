@@ -102,47 +102,34 @@ public class NewSurface : MonoBehaviour {
 	}
 		
 	public void SelectSurface() {
-		StartCoroutine (Select ());
+		if (selectedSurface && selectedSurface != this) {
+			selectedSurface.DeselectSurface ();
+		}
+		StartCoroutine (Glow ());
 	}
 
 	public void DeselectSurface() {
-		StartCoroutine (Deselect ());
+		selectedSurface = null;
+		Material material = gameObject.GetComponent<Renderer>().material;
+		_glowAmount = 0; //to account for rounding error
+		material.DisableKeyword("_EMISSION");
+		material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack;
+		material.SetColor("_EmissionColor", Color.black);
 	}
 
-	private IEnumerator Select()
+	private IEnumerator Glow()
 	{
 		// Setup
-		if (selectedSurface && selectedSurface != this) {
-			selectedSurface.DeselectSurface ();
-			yield return new WaitForSeconds(0.01f); //HACK in case same surface is re-selected
-		}
 		Material material = gameObject.GetComponent<Renderer>().material;
 		material.EnableKeyword("_EMISSION");
 		material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
+		selectedSurface = this;
 		// Increase intensity (fade in)
-		while (_glowAmount < 0.5)
+		while (_glowAmount < 0.25)
 		{
 			material.SetColor("_EmissionColor", glowColor * _glowAmount);
 			_glowAmount += 0.01f;
 			yield return new WaitForSeconds(0.01f);
 		}
-		selectedSurface = this;
-	}
-
-	private IEnumerator Deselect() {
-		selectedSurface = null; //DO NOT MOVE (see hack in Select())
-		Material material = gameObject.GetComponent<Renderer>().material;
-		// Increase intensity (fade in)
-		while (_glowAmount > 0)
-		{
-			material.SetColor("_EmissionColor", glowColor * _glowAmount);
-			_glowAmount -= 0.01f;
-			yield return new WaitForSeconds(0.01f);
-		}
-		_glowAmount = 0; //to account for rounding error
-		// Cleanup
-		material.DisableKeyword("_EMISSION");
-		material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack;
-		material.SetColor("_EmissionColor", Color.black);
 	}
 }

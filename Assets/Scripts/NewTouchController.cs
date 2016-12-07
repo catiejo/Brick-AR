@@ -13,7 +13,7 @@ public class NewTouchController : MonoBehaviour {
 	public TangoPointCloud tangoPointCloud;
 	private Vector3 firstCorner;
 	private Vector3 oppositeCorner;
-	private bool hasStartPoint;
+	private bool hasStartPoint = false;
 
 	/* USEFUL FOR DEBUGGING */
 //	void Start() {
@@ -67,9 +67,9 @@ public class NewTouchController : MonoBehaviour {
 
 	private void HandleTouch(Vector2 position) {
 		var diagonal = firstCorner - oppositeCorner;
-		if (diagonal.magnitude < 0.05f) { //Surface not big enough; could also be a UI tap
+		if (diagonal.magnitude < 0.1f) { //Surface not big enough; could also be a UI tap
 			if (!TrySelectSurface (position)) {
-				debug.text = "Unable to select the surface. Please try selecting a different point.";
+				debug.text = "No surface selected.";
 			}
 		} else {
 			CreateSurface ();
@@ -101,14 +101,21 @@ public class NewTouchController : MonoBehaviour {
 	}
 
 	private bool TrySelectSurface(Vector2 touch) {
-		RaycastHit hit;
-		var ray = Camera.main.ScreenPointToRay (touch);
-		if(Physics.Raycast(ray.origin, ray.direction, out hit))
-		{
-			NewSurface selected = hit.collider.gameObject.GetComponent<NewSurface> ();
-			if (selected != null) {
-				selected.SelectSurface ();
-				return true;
+		//Check if you hit a UI element (http://answers.unity3d.com/questions/821590/unity-46-how-to-raycast-against-ugui-objects-from.html)
+		var pointer = new PointerEventData(EventSystem.current);
+		pointer.position = touch;
+		var results = new List<RaycastResult> ();
+		EventSystem.current.RaycastAll(pointer, results);
+		if (results.Count == 0) {
+			//Check if you hit a surface
+			RaycastHit hit;
+			var ray = Camera.main.ScreenPointToRay (touch);
+			if (Physics.Raycast (ray.origin, ray.direction, out hit)) {
+				NewSurface selected = hit.collider.gameObject.GetComponent<NewSurface> ();
+				if (selected != null) {
+					selected.SelectSurface ();
+					return true;
+				}
 			}
 		}
 		return false;
