@@ -20,6 +20,24 @@ public class NewSurface : MonoBehaviour {
 	}
 
 	public void Create(Plane plane, Vector3 firstCorner, Vector3 oppositeCorner, Vector3 center) {
+		var corners = FindCorners (firstCorner, oppositeCorner);
+		CoreCreate (plane, corners, center);
+	}
+
+	public void Create(Plane plane, Vector3 firstCorner, Vector3 oppositeCorner, List<Vector3> vertices, Vector3 center) {
+		var corners = FindCorners(vertices);
+		CoreCreate (plane, corners, center);
+	}
+
+	public void SetMaterial(Material material) {
+		GetComponent<MeshRenderer> ().material = material;
+	}
+
+	public void Undo() {
+		DestroyImmediate (gameObject);
+	}
+
+	private void CoreCreate(Plane plane, Vector3[] corners, Vector3 center) {
 		//Member variables
 		_center = center;
 		_plane = plane;
@@ -30,18 +48,11 @@ public class NewSurface : MonoBehaviour {
 		transform.position = _center;
 		transform.rotation = Quaternion.LookRotation (-_plane.normal, yaxis);
 		//Set up mesh
-		_vertices = FindCorners (firstCorner, oppositeCorner);
+		_vertices = corners;
 		_triangles = FindTriangles ();
 		_uv = FindUV ();
 		CreateMesh ();
-	}
 
-	public void SetMaterial(Material material) {
-		GetComponent<MeshRenderer> ().material = material;
-	}
-
-	public void Undo() {
-		DestroyImmediate (gameObject);
 	}
 
 	private void CreateMesh() {
@@ -56,7 +67,7 @@ public class NewSurface : MonoBehaviour {
 	}
 
 	private Vector3[] FindCorners(Vector3 firstCorner, Vector3 oppositeCorner) {
-		//Put vectors in local space
+		//Put corners in local space
 		var corner1 = transform.InverseTransformPoint(firstCorner);
 		corner1.z = 0;
 		var corner2 = transform.InverseTransformPoint(oppositeCorner);
@@ -71,6 +82,45 @@ public class NewSurface : MonoBehaviour {
 		corners[1] = new Vector3(max.x, min.y, 0); //bottom right
 		corners[2] = new Vector3(min.x, max.y, 0); //top left
 		corners[3] = new Vector3(max.x, max.y, 0); //top right
+
+		return corners;
+	}
+
+	private Vector3[] FindCorners(List<Vector3> vertices) {
+		//FIXME dear lord this whole function
+		Vector3 bottomLeft = new Vector3 (float.MaxValue, float.MaxValue, 0); //lowest y coordinate
+		Vector3 bottomRight = new Vector3 (float.MinValue, float.MaxValue, 0); //highest x coordinate
+		Vector3 topLeft = new Vector3 (float.MaxValue, float.MinValue, 0); //lowest x coordinate
+		Vector3 topRight = new Vector3 (float.MinValue, float.MinValue, 0); //highest y coordinate
+
+		var corners = new Vector3[4];
+
+		foreach (Vector3 v in vertices) {
+			var local = transform.InverseTransformPoint (v);
+			local.z = 0;
+			if (local.x <= topLeft.x) {
+				if (local.y >= bottomLeft.y) {
+					topLeft = local;
+				} else {
+					bottomLeft = local;
+				}
+			} else if (local.x >= bottomRight.x) {
+				if (local.y >= topRight.y) {
+					topRight = local;
+				} else {
+					bottomRight = local;
+				}
+			} else if (local.y <= bottomLeft.y) {
+				bottomLeft = local;
+			} else if (local.y >= topRight.y) {
+				topRight = local;
+			}
+		}
+
+		corners[0] = bottomLeft;
+		corners[1] = bottomRight;
+		corners[2] = topLeft;
+		corners[3] = topRight;
 
 		return corners;
 	}
