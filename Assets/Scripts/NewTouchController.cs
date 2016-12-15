@@ -35,8 +35,17 @@ public class NewTouchController : MonoBehaviour {
 //	void Start() {
 //		var center = new Vector3(1, 1, 1);
 //		var plane = new Plane (Quaternion.Euler(30, 60, 70) * -Vector3.forward, center);
+//		var vertices = new List<Vector3> ();
+//		vertices.Add (center + new Vector3 (0, 1, 0));
+//		vertices.Add (center + new Vector3 (1, 0, 0));
+//		vertices.Add (center + new Vector3 (0, -1, 0));
+//		vertices.Add (center + new Vector3 (-1, 0, 0));
+//		vertices.Add (center + new Vector3 (1, 1, 0));
+//		vertices.Add (center + new Vector3 (-1, 1, 0));
+//		vertices.Add (center + new Vector3 (1, -1, 0));
+//		vertices.Add (center + new Vector3 (-1, -1, 0));
 //		NewSurface surface = Instantiate (surfaceTemplate) as NewSurface;
-//		surface.Create (plane, center + new Vector3(1, 1, 1), center + new Vector3(-1, -1, -1), center);
+//		surface.Create (plane, vertices, center);
 //	}
 
 	void Update () {
