@@ -24,8 +24,8 @@ public class NewSurface : MonoBehaviour {
 		CoreCreate (plane, corners, center);
 	}
 
-	public void Create(Plane plane, Vector3 firstCorner, Vector3 oppositeCorner, List<Vector3> vertices, Vector3 center) {
-		var corners = FindCorners(vertices);
+	public void Create(Plane plane, List<Vector3> vertices, Vector3 center) {
+		var corners = FindCorners(vertices, center);
 		CoreCreate (plane, corners, center);
 	}
 
@@ -86,33 +86,36 @@ public class NewSurface : MonoBehaviour {
 		return corners;
 	}
 
-	private Vector3[] FindCorners(List<Vector3> vertices) {
+	private Vector3[] FindCorners(List<Vector3> vertices, Vector3 center) {
 		//FIXME dear lord this whole function
-		Vector3 bottomLeft = new Vector3 (float.MaxValue, float.MaxValue, 0); //lowest y coordinate
-		Vector3 bottomRight = new Vector3 (float.MinValue, float.MaxValue, 0); //highest x coordinate
-		Vector3 topLeft = new Vector3 (float.MaxValue, float.MinValue, 0); //lowest x coordinate
-		Vector3 topRight = new Vector3 (float.MinValue, float.MinValue, 0); //highest y coordinate
+		var bottomLeft = center; //lowest y coordinate
+		var bottomRight = center; //highest x coordinate
+		var topLeft = center; //lowest x coordinate
+		var topRight = center; //highest y coordinate
 
 		var corners = new Vector3[4];
 
 		foreach (Vector3 v in vertices) {
 			var local = transform.InverseTransformPoint (v);
 			local.z = 0;
-			if (local.x <= topLeft.x) {
-				if (local.y >= bottomLeft.y) {
-					topLeft = local;
-				} else {
-					bottomLeft = local;
-				}
-			} else if (local.x >= bottomRight.x) {
-				if (local.y >= topRight.y) {
-					topRight = local;
-				} else {
-					bottomRight = local;
-				}
-			} else if (local.y <= bottomLeft.y) {
+			//Check if better bottomLeft
+			if (local.y <= bottomLeft.y && local.x < bottomRight.x) {
+				Debug.LogWarning("bottomLeft is now " + local.ToString());
 				bottomLeft = local;
-			} else if (local.y >= topRight.y) {
+			} 
+			//Check if better bottomRight
+			if (local.x >= bottomRight.x && local.y < topRight.y) {
+				Debug.LogWarning("bottomRight is now " + local.ToString());
+				bottomRight = local;
+			}
+			//Check if better topLeft
+			if (local.x <= topLeft.x && local.y > bottomLeft.y) {
+				Debug.LogWarning("topLeft is now " + local.ToString());
+				topLeft = local;
+			}
+			//Check if better topRight
+			if (local.y >= topRight.y && local.x > topLeft.x) {
+				Debug.LogWarning("topRight is now " + local.ToString());
 				topRight = local;
 			}
 		}
