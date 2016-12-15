@@ -156,7 +156,7 @@ public class NewTouchController : MonoBehaviour {
 				vertices = FindVertices (plane, planeCenter);
 				NewSurface surface = Instantiate (surfaceTemplate) as NewSurface;
 				if (vertices.Count > 0) {
-					surface.Create (plane, firstCorner, oppositeCorner, vertices, planeCenter);
+					surface.Create (plane, vertices, planeCenter);
 				    return true;
 				}
 				debug.text = "No surface found. Generating backup plane.";
