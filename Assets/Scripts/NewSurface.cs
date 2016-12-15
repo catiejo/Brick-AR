@@ -99,22 +99,22 @@ public class NewSurface : MonoBehaviour {
 			var local = transform.InverseTransformPoint (v);
 			local.z = 0;
 			//Check if better bottomLeft
-			if (local.y <= bottomLeft.y && local.x < bottomRight.x) {
+			if (local.y <= bottomLeft.y && local.x <= bottomLeft.x && local.x < bottomRight.x) {
 				Debug.LogWarning("bottomLeft is now " + local.ToString());
 				bottomLeft = local;
 			} 
 			//Check if better bottomRight
-			if (local.x >= bottomRight.x && local.y < topRight.y) {
+			if (local.x >= bottomRight.x && local.y <= bottomRight.y && local.y < topRight.y) {
 				Debug.LogWarning("bottomRight is now " + local.ToString());
 				bottomRight = local;
 			}
 			//Check if better topLeft
-			if (local.x <= topLeft.x && local.y > bottomLeft.y) {
+			if (local.x <= topLeft.x && local.y >= topLeft.y && local.y > bottomLeft.y) {
 				Debug.LogWarning("topLeft is now " + local.ToString());
 				topLeft = local;
 			}
 			//Check if better topRight
-			if (local.y >= topRight.y && local.x > topLeft.x) {
+			if (local.y >= topRight.y && local.x >= topRight.x && local.x > topLeft.x) {
 				Debug.LogWarning("topRight is now " + local.ToString());
 				topRight = local;
 			}
