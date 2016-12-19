@@ -2,6 +2,7 @@
     SubShader {
         Tags { "Queue" = "Background-1" }
         Pass {
+//        	ZWrite On
             ColorMask 0
         
             CGPROGRAM
