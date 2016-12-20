@@ -40,7 +40,7 @@
                                                              UNITY_PROJ_COORD(i.projPos)).r);
             	half4 c;
                 c.r = depth;
-                c.g = 1 - depth;
+                c.g = depth;
                 c.b = depth;
                 c.a = 1;
  
