@@ -83,17 +83,9 @@ public class NewTouchController : MonoBehaviour {
 		float lerpOffset = -0.25f; //Must be negative to start
 		float lerpAmount = 0.5f;
 		Vector3 center = Vector3.Lerp (firstCorner, oppositeCorner, lerpAmount);
-		//Search for plane along diagonal, fanning out from center
-		while (!tangoPointCloud.FindPlane (Camera.main, Camera.main.WorldToScreenPoint(center), out planeCenter, out plane)) {
-			if (Mathf.Abs (lerpOffset) >= 0.5) {
-				debug.text = "No surface found. Please try again.";
-				return false;
-			} else if (lerpOffset > 0) {
-				lerpOffset += 0.1f;
-				lerpOffset *= -1;
-			}
-			lerpAmount = 0.5f + lerpOffset;
-			center = Vector3.Lerp (firstCorner, oppositeCorner, lerpAmount);
+		if (!tangoPointCloud.FindPlane (Camera.main, Camera.main.WorldToScreenPoint(center), out planeCenter, out plane)) {
+			debug.text = "No surface found. Please try again.";
+			return false;
 		}
 		NewSurface surface = Instantiate (surfaceTemplate) as NewSurface;
 		surface.Create (plane, firstCorner, oppositeCorner, planeCenter);
