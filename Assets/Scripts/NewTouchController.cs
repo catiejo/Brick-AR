@@ -102,7 +102,8 @@ public class NewTouchController : MonoBehaviour {
 			//Check if you hit a surface
 			RaycastHit hit;
 			var ray = Camera.main.ScreenPointToRay (touch);
-			if (Physics.Raycast (ray.origin, ray.direction, out hit)) {
+			var layerMask = 1 << LayerMask.NameToLayer("Ignore Raycast");
+			if (Physics.Raycast (ray.origin, ray.direction, out hit, layerMask)) {
 				NewSurface selected = hit.collider.gameObject.GetComponent<NewSurface> ();
 				if (selected != null) {
 					selected.SelectSurface ();
