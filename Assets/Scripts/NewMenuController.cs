@@ -4,7 +4,7 @@ using System.Collections;
 
 public class NewMenuController : MonoBehaviour {
 	public Text debug;
-	private NewSurface _trackedSurface;
+	private Surface _trackedSurface;
 	public Material[] brickMaterials;
 	private int _currentMaterial = 0; //defaults to beige
 
@@ -16,8 +16,8 @@ public class NewMenuController : MonoBehaviour {
 		if (_trackedSurface) {
 			transform.position = Camera.main.WorldToScreenPoint(_trackedSurface.transform.position);
 		}
-		if (NewSurface.selectedSurface && _trackedSurface != NewSurface.selectedSurface) {
-			_trackedSurface = NewSurface.selectedSurface;
+		if (Surface.selectedSurface && _trackedSurface != Surface.selectedSurface) {
+			_trackedSurface = Surface.selectedSurface;
 			ExpandMenu ();
 		}
 	}
