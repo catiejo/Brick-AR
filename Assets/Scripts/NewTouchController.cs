@@ -14,6 +14,22 @@ public class NewTouchController : MonoBehaviour {
 	private Vector3 firstCorner;
 	private Vector3 oppositeCorner;
 	private bool hasStartPoint = false;
+	private bool _dragEdgeDetectionMode = true;
+	private int neighborCountThreshold = 4;
+	private float neighborDistanceThreshold = 0.000175f;
+	private float planeDistanceThreshold = 0.075f;
+	//Helper class for kdTree
+	public class Point : MonoBehaviour
+	{
+		public double[] doublePosition;
+		public Vector3 vectorPosition;
+		public bool visited = false;
+		public Point(Vector3 point) {
+			doublePosition = new double[3]{point.x, point.y, point.z};
+			vectorPosition = point;
+		}
+	}
+
 
 	/* USEFUL FOR DEBUGGING */
 //	void Start() {
@@ -79,7 +95,6 @@ public class NewTouchController : MonoBehaviour {
 	private bool CreateSurface() {
 		Vector3 planeCenter;
 		Plane plane;
-
 		float lerpOffset = -0.25f; //Must be negative to start
 		float lerpAmount = 0.5f;
 		Vector3 center = Vector3.Lerp (firstCorner, oppositeCorner, lerpAmount);
@@ -88,8 +103,59 @@ public class NewTouchController : MonoBehaviour {
 			return false;
 		}
 		NewSurface surface = Instantiate (surfaceTemplate) as NewSurface;
-		surface.Create (plane, firstCorner, oppositeCorner, planeCenter);
+		if (_dragEdgeDetectionMode) {
+			surface.Create (plane, firstCorner, oppositeCorner, planeCenter);
+		} else {
+			var surfaceVertices = FindSurfaceVertices (plane, planeCenter);
+			if (surfaceVertices.Count == 0) {
+				debug.text = "No vertices found on the surface.";
+				return false;
+			}
+			surface.Create (plane, surfaceVertices, planeCenter);
+		}
 		return true;
+	}
+
+	private List<Vector3> FindSurfaceVertices(Plane plane, Vector3 planeCenter) {
+		var verticesOnSurface = new List<Vector3> ();
+
+		//Step One: Narrow point cloud to points on the plane
+		var verticesOnPlane = new List<Vector3>();
+		for (int i = 0; i < tangoPointCloud.m_pointsCount; i++) {
+			var p = tangoPointCloud.m_points [i];
+			if (Mathf.Abs (plane.GetDistanceToPoint (p)) <= planeDistanceThreshold) {
+				verticesOnPlane.Add (p);
+			}
+		}
+
+		//Step Two: Create a kd-tree of the points on the plane
+		var kdTree = new KDTree<Point>(3);
+		foreach (var vertex in verticesOnPlane) {
+			var point = new Point (vertex);
+			kdTree.AddPoint(point.doublePosition, point);
+		}
+
+		//Step Three: Breadth-first-style search for points on surface.
+		var pointsToCheck = new Queue<Point>();
+		pointsToCheck.Enqueue (new Point(planeCenter));
+		while (pointsToCheck.Count != 0) {
+			var currentPoint = pointsToCheck.Dequeue ();
+			var neighbors = kdTree.NearestNeighbors(currentPoint.doublePosition, neighborCountThreshold, neighborDistanceThreshold);
+			int neighborCount = 0;
+			while (neighbors.MoveNext()) {
+				if (!neighbors.Current.visited) {
+					pointsToCheck.Enqueue (neighbors.Current);
+					neighbors.Current.visited = true;
+				}
+				neighborCount++;
+			}
+			if (neighborCount >= neighborCountThreshold) {
+				verticesOnSurface.Add (currentPoint.vectorPosition);
+			}
+		}
+
+		debug.text = "There are " + verticesOnPlane.Count + " vertices on the plane and " + verticesOnSurface.Count + " vertices on the surface.";
+		return verticesOnSurface;
 	}
 
 	private bool TrySelectSurface(Vector2 touch) {

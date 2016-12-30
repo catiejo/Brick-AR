@@ -11,15 +11,50 @@ public class NewSurface : MonoBehaviour {
 	private Vector3 _center;
 	private Plane _plane;
 	private float _glowAmount;
+	private bool _isConvexHullSurface;
 	private int[] _triangles;
 	private Vector2[] _uv;
 	private Vector3[] _vertices;
+	//Helper class for MIConvexHull
+	public class MIVertex : IVertex
+	{
+		public int Index;
+
+		public double[] Position { get; set; }
+
+		public Vector3 ToVector3()
+		{
+			var position = Position;
+			if (position == null || position.Length < 3)
+				return Vector3.zero;
+			return new Vector3((float)position[0], (float)position[1], (float)position[2]);
+		}
+	}
 
 	void Start() {
 		SelectSurface ();
 	}
 
 	public void Create(Plane plane, Vector3 firstCorner, Vector3 oppositeCorner, Vector3 center) {
+		_isConvexHullSurface = false;
+		SetUpSurface (plane, center);
+		//Set up mesh
+		_vertices = FindCorners (firstCorner, oppositeCorner);
+		_triangles = FindTriangles ();
+		_uv = FindUV ();
+		CreateMesh ();
+	}
+
+	public void Create(Plane plane, List<Vector3> worldVertices, Vector3 center) {
+		_isConvexHullSurface = true;
+		SetUpSurface (plane, center);
+		_vertices = FindLocalVertices (worldVertices);
+		_triangles = FindTriangles ();
+		_uv = FindUV ();
+		CreateMesh ();
+	}
+
+	private void SetUpSurface(Plane plane, Vector3 center) {
 		//Member variables
 		_center = center;
 		_plane = plane;
@@ -29,12 +64,8 @@ public class NewSurface : MonoBehaviour {
 		//Position + Rotation
 		transform.position = _center;
 		transform.rotation = Quaternion.LookRotation (-_plane.normal, yaxis);
-		//Set up mesh
-		_vertices = FindCorners (firstCorner, oppositeCorner);
-		_triangles = FindTriangles ();
-		_uv = FindUV ();
-		CreateMesh ();
 	}
+		
 
 	public void SetMaterial(Material material) {
 		GetComponent<MeshRenderer> ().material = material;
@@ -75,30 +106,52 @@ public class NewSurface : MonoBehaviour {
 		return corners;
 	}
 
+	private Vector3[] FindLocalVertices(List<Vector3> worldVertices) {
+		var localVertices = new List<Vector3>();
+		foreach (var worldVertex in worldVertices) {
+			localVertices.Add(transform.InverseTransformPoint(worldVertex));
+		}
+		return localVertices.ToArray ();
+	}
+
 	private int[] FindTriangles() {
-		var triangles = new int[6];
-
-		//Lower left triangle.
-		triangles[0] = 0;
-		triangles[1] = 2;
-		triangles[2] = 1;
-		//Upper right triangle.   
-		triangles[3] = 2;
-		triangles[4] = 3;
-		triangles[5] = 1;
-
-		return triangles;
+		var triangles = new List<int> ();
+		if (_isConvexHullSurface) {
+			var miVertices = new List<MIVertex> ();
+			//Convert vertices to MIVertices
+			for (int i = 0; i < _vertices.Length; ++i) {
+				var miVertex = new MIVertex ();
+				var vertex = _vertices [i];
+				miVertex.Index = i;
+				miVertex.Position = new double[3]{ vertex.x, vertex.y, vertex.z };
+				miVertices.Add (miVertex);
+			}
+			//Generate convex hull + extract triangles
+			var hull = ConvexHull.Create (miVertices);
+			foreach (var face in hull.Faces) {
+				foreach (var vertex in face.Vertices) {
+					triangles.Add (vertex.Index);
+				}
+			}
+		} else {
+			//Lower left triangle.
+			triangles.Add (0);
+			triangles.Add (1);
+			triangles.Add (2);
+			//Upper right triangle.   
+			triangles.Add (3);
+			triangles.Add (4);
+			triangles.Add (5);
+		}
+		return triangles.ToArray();
 	}
 
 	private Vector2[] FindUV() {
-		var uv = new Vector2[4];
-
-		uv[0] = _vertices[0] * 3.0f;
-		uv[1] = _vertices[1] * 3.0f;
-		uv[2] = _vertices[2] * 3.0f;
-		uv[3] = _vertices[3] * 3.0f;
-
-		return uv;
+		var uv = new List<Vector2> ();
+		foreach (var vertex in _vertices) {
+			uv.Add (vertex * 3.0f); //Add method knows to discard z coordinate
+		} 
+		return uv.ToArray();
 	}
 		
 	public void SelectSurface() {
