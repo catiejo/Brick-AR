@@ -35,10 +35,9 @@ public class TapSurfaceMesh : SurfaceMesh {
 		}
 	}
 
-	public Mesh Create(Vector3 center, List<Vector3> worldVertices) {
-//		SetUpSurface (plane, center);
+	public Mesh Create(Plane plane, Vector3 center, List<Vector3> worldVertices) {
+		SetupLocalCoords (plane, center);
 		_worldVertices = worldVertices;
-		_center = center;
 		Mesh tapSurfaceMesh = CreateMesh ();
 		return tapSurfaceMesh;
 	}
@@ -68,10 +67,11 @@ public class TapSurfaceMesh : SurfaceMesh {
 	public override Vector3[] FindVertices ()
 	{
 		var vertices = new List<Vector3> ();
+		var localVertices = FindLocalVertices (_worldVertices);
 
 		//Step One: Create a kd-tree of the points on the plane
 		var kdTree = new KDTree<Point>(3);
-		foreach (var vertex in _worldVertices) {
+		foreach (var vertex in localVertices) {
 			var point = new Point (vertex);
 			kdTree.AddPoint(point.doublePosition, point);
 		}
@@ -96,4 +96,13 @@ public class TapSurfaceMesh : SurfaceMesh {
 
 		return vertices.ToArray();
 	}
+
+	private List<Vector3> FindLocalVertices(List<Vector3> worldVertices) {
+		var localVertices = new List<Vector3>();
+		foreach (var worldVertex in worldVertices) {
+			localVertices.Add(transform.InverseTransformPoint(worldVertex));
+		}
+		return localVertices;
+	}
+
 }

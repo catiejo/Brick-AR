@@ -4,6 +4,7 @@ using System.Collections.Generic; //Lists
 
 public abstract class SurfaceMesh : MonoBehaviour {
 	public Vector3 _center;
+	public Plane _plane;
 	public int[] _triangles;
 	public Vector2[] _uv;
 	public Vector3[] _vertices;
@@ -34,6 +35,18 @@ public abstract class SurfaceMesh : MonoBehaviour {
 			uv.Add (vertex * 3.0f); //Add method knows to discard z coordinate
 		} 
 		return uv.ToArray();
+	}
+
+	public bool SetupLocalCoords(Plane plane, Vector3 center) {
+		_plane = plane;
+		_center = center;
+		//Plane coordinate system
+		var xaxis = Quaternion.LookRotation(-_plane.normal) * Vector3.right; //Horizontal vector transformed to plane's rotation
+		var yaxis = Vector3.Cross(xaxis, _plane.normal);
+		//Position + Rotation
+		transform.position = _center;
+		transform.rotation = Quaternion.LookRotation (-_plane.normal, yaxis);
+		return true;
 	}
 
 }
