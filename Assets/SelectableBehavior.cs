@@ -7,9 +7,10 @@ public class SelectableBehavior : MonoBehaviour {
 	private float _glowAmount;
 
 	public void SelectSurface() {
-		if (selectedSurface && selectedSurface != this) {
+		if (selectedSurface && selectedSurface != gameObject.GetComponent<Surface> ()) {
 			selectedSurface.DeselectSurface ();
 		}
+		selectedSurface = gameObject.GetComponent<Surface> ();
 		StartCoroutine (Glow ());
 	}
 
@@ -28,7 +29,6 @@ public class SelectableBehavior : MonoBehaviour {
 		Material material = gameObject.GetComponent<Renderer>().material;
 		material.EnableKeyword("_EMISSION");
 		material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
-		selectedSurface = this;
 		// Increase intensity (fade in)
 		while (_glowAmount < 0.25)
 		{
