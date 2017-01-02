@@ -3,7 +3,6 @@ using System.Collections;
 using Tango;
 
 public class OcclusionController : MonoBehaviour {
-	private bool _isOccluding;
 	public DepthPanel depthPanel;
 	public GameObject dynamicMesh;
 	public TangoApplication tango;
@@ -14,7 +13,6 @@ public class OcclusionController : MonoBehaviour {
 	}
 
 	public void ToggleOcclusion(bool currentState) {
-		_isOccluding = currentState;
 		depthPanel.ToggleDepthPanel (currentState);
 		dynamicMesh.SetActive (currentState);
 		tango.m_enable3DReconstruction = currentState;
