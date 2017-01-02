@@ -178,8 +178,4 @@ public class TouchController : MonoBehaviour {
 		}
 		return false;
 	}
-
-	public void ChangeEdgeDetectionMode(int mode) {
-		_dragEdgeDetectionMode = (mode == 0);
-	}
 }

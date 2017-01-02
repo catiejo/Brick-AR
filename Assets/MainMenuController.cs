@@ -6,6 +6,7 @@ public class MainMenuController : MonoBehaviour {
 	public Image menuDrawer;
 	private Color _color = new Color(0, 0, 0, 0);
 	private bool _isOpen = false;
+	private bool _dragEdgeDetectionMode = true;
 
 	void Update () {
 		if (_isOpen && menuDrawer.transform.position.x < 0.0f) {
@@ -26,5 +27,11 @@ public class MainMenuController : MonoBehaviour {
 		menuDrawer.transform.position += new Vector3(amount, 0, 0);
 	}
 
+	public void ChangeEdgeDetectionMode(int mode) {
+		_dragEdgeDetectionMode = (mode == 0);
+	}
 
+	public bool GetEdgeDetectionMode() {
+		return _dragEdgeDetectionMode;
+	}
 }
