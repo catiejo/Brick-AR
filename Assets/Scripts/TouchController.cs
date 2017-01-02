@@ -30,7 +30,6 @@ public class TouchController : MonoBehaviour {
 		}
 	}
 
-
 	/* USEFUL FOR DEBUGGING */
 //	void Start() {
 //		var center = new Vector3(1, 1, 1);
@@ -44,7 +43,7 @@ public class TouchController : MonoBehaviour {
 		{	
 			Touch touch = Input.GetTouch (0);
 			int closestPointIndex = tangoPointCloud.FindClosestPoint (Camera.main, touch.position, 500);
-			Vector3 closestPoint = tangoPointCloud.m_points [closestPointIndex];
+			Vector3 closestPoint = tangoPointCloud.m_points [closestPointIndex]; // Returns -1 if not found
 			if (closestPointIndex != -1) {
 				if (!hasStartPoint) {
 					StartLine (closestPoint);
@@ -54,7 +53,7 @@ public class TouchController : MonoBehaviour {
 				ExtendLine (closestPoint);
 				oppositeCorner = closestPoint;
 			}
-			if (touch.phase == TouchPhase.Ended) {
+			if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled) {
 				line.SetActive(false);
 				if (hasStartPoint) {
 					hasStartPoint = false;
@@ -83,7 +82,7 @@ public class TouchController : MonoBehaviour {
 
 	private void HandleTouch(Vector2 position) {
 		var diagonal = firstCorner - oppositeCorner;
-		if (diagonal.magnitude < 0.1f) { //Surface not big enough; could also be a UI tap
+		if (diagonal.magnitude < 0.1f) { // Treat as a tap
 			if (!TrySelectSurface (position)) {
 				debug.text = "No surface selected.";
 			}
@@ -162,12 +161,12 @@ public class TouchController : MonoBehaviour {
 		var pointer = new PointerEventData(EventSystem.current);
 		pointer.position = touch;
 		var results = new List<RaycastResult> ();
-		EventSystem.current.RaycastAll(pointer, results);
+		EventSystem.current.RaycastAll(pointer, results); // Outputs to 'results'
 		if (results.Count == 0) {
 			//Check if you hit a surface
 			RaycastHit hit;
 			var ray = Camera.main.ScreenPointToRay (touch);
-			var layerMask = 1 << LayerMask.NameToLayer("Ignore Raycast");
+			var layerMask = 1 << LayerMask.NameToLayer("Ignore Raycast"); //http://answers.unity3d.com/questions/8715/how-do-i-use-layermasks.html
 			if (Physics.Raycast (ray.origin, ray.direction, out hit, layerMask)) {
 				Surface selected = hit.collider.gameObject.GetComponent<Surface> ();
 				if (selected != null) {
