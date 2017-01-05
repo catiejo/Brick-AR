@@ -124,9 +124,9 @@ public class TouchController : MonoBehaviour {
 			var ray = Camera.main.ScreenPointToRay (touch);
 			var layerMask = 1 << LayerMask.NameToLayer("Ignore Raycast"); //http://answers.unity3d.com/questions/8715/how-do-i-use-layermasks.html
 			if (Physics.Raycast (ray.origin, ray.direction, out hit, layerMask)) {
-				Surface selected = hit.collider.gameObject.GetComponent<Surface> ();
+				SelectableBehavior selected = hit.collider.gameObject.GetComponent<SelectableBehavior> ();
 				if (selected != null) {
-					selected.SelectSurface ();
+					selected.SelectSurface (selected.associatedSurface);
 					return true;
 				}
 			}
