@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using Tango;
 
 public class OcclusionController : MonoBehaviour {
-	public DepthPanel depthPanel;
+	public Toggle depthPanelToggle;
 	public GameObject dynamicMesh;
 	public TangoApplication tango;
 
@@ -16,7 +17,8 @@ public class OcclusionController : MonoBehaviour {
 	/// </summary>
 	/// <param name="currentState">Turn on if <c>true</c>, off if <c>false</c>.</param>
 	public void ToggleOcclusion(bool currentState) {
-		depthPanel.ToggleDepthPanel (currentState);
+		depthPanelToggle.isOn = false;
+		depthPanelToggle.interactable = currentState;
 		dynamicMesh.SetActive (currentState);
 		tango.m_enable3DReconstruction = currentState;
 		if (currentState) {
@@ -29,6 +31,5 @@ public class OcclusionController : MonoBehaviour {
 			tango.m_3drUseAreaDescriptionPose = false;
 			tango.m_3drMinNumVertices = 20;
 		}
-
 	}
 }
