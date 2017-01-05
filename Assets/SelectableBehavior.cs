@@ -13,6 +13,10 @@ public class SelectableBehavior : MonoBehaviour {
 		SelectSurface (associatedSurface);
 	}
 
+	/// <summary>
+	/// Selects a new selectedSurface.
+	/// </summary>
+	/// <param name="selected">The surface to be selected.</param>
 	public void SelectSurface(Surface selected) {
 		if (selectedSurface && selectedSurface != selected) {
 			DeselectSurface ();
@@ -21,15 +25,20 @@ public class SelectableBehavior : MonoBehaviour {
 		StartCoroutine (Glow ());
 	}
 
+	/// <summary>
+	/// Deselects the current selectedSurface.
+	/// </summary>
 	public static void DeselectSurface() {
 		Material material = selectedSurface.GetComponent<Renderer>().material;
-//		_glowAmount = 0; //to account for rounding error
 		material.DisableKeyword("_EMISSION");
 		material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack;
 		material.SetColor("_EmissionColor", Color.black);
 		selectedSurface = null;
 	}
 
+	/// <summary>
+	/// Makes the selectedSurface glow.
+	/// </summary>
 	private IEnumerator Glow()
 	{
 		// Setup

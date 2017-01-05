@@ -10,18 +10,10 @@ public class TouchController : MonoBehaviour {
 	public GameObject line;
 	public Surface surfaceTemplate;
 	public TangoPointCloud tangoPointCloud;
-	private Vector3 firstCorner;
-	private Vector3 oppositeCorner;
-	private bool hasStartPoint = false;
-	private float planeDistanceThreshold = 0.075f;
 
-	/* USEFUL FOR DEBUGGING */
-//	void Start() {
-//		var center = new Vector3(1, 1, 1);
-//		var plane = new Plane (Quaternion.Euler(30, 60, 70) * -Vector3.forward, center);
-//		NewSurface surface = Instantiate (surfaceTemplate) as NewSurface;
-//		surface.Create (plane, center + new Vector3(1, 1, 1), center + new Vector3(-1, -1, -1), center);
-//	}
+	private Vector3 _firstCorner;
+	private bool _hasStartPoint = false;
+	private Vector3 _oppositeCorner;
 
 	void Update () {
 		if (Input.touchCount > 0)
@@ -30,38 +22,39 @@ public class TouchController : MonoBehaviour {
 			int closestPointIndex = tangoPointCloud.FindClosestPoint (Camera.main, touch.position, 500);
 			Vector3 closestPoint = tangoPointCloud.m_points [closestPointIndex]; // Returns -1 if not found
 			if (closestPointIndex != -1) {
-				if (!hasStartPoint) {
+				if (!_hasStartPoint) {
 					StartLine (closestPoint);
-					firstCorner = closestPoint;
-					hasStartPoint = true;
+					_firstCorner = closestPoint;
+					_hasStartPoint = true;
 				}
 				ExtendLine (closestPoint);
-				oppositeCorner = closestPoint;
+				_oppositeCorner = closestPoint;
 			}
 			if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled) {
 				line.SetActive(false);
-				if (hasStartPoint) {
-					hasStartPoint = false;
+				if (_hasStartPoint) {
+					_hasStartPoint = false;
 					HandleTouch (touch.position);
 				}
 			}
 		}
-		/* USEFUL FOR DEBUGGING */
-//		if (Input.GetMouseButtonDown(0)) {
-//		}
 	}
 
+	/// <summary>
+	/// Creates a Surface on a real-world plane using either a DragSurfaceMesh or TapSurfaceMesh.
+	/// </summary>
+	/// <returns><c>true</c>, if Surface was successfully created, <c>false</c> otherwise.</returns>
 	private bool CreateSurface() {
 		Vector3 planeCenter;
 		Plane plane;
-		if (!tangoPointCloud.FindPlane (Camera.main, Camera.main.WorldToScreenPoint(Vector3.Lerp (firstCorner, oppositeCorner, 0.5f)), out planeCenter, out plane)) {
+		if (!tangoPointCloud.FindPlane (Camera.main, Camera.main.WorldToScreenPoint(Vector3.Lerp (_firstCorner, _oppositeCorner, 0.5f)), out planeCenter, out plane)) {
 			debug.text = "No surface found. Please try again.";
 			return false;
 		}
 		Surface surface = Instantiate (surfaceTemplate) as Surface;
 		SurfaceMesh surfaceMesh;
 		if (MainMenuController.GetEdgeDetectionMode() == "DRAG") {
-			surfaceMesh = new DragSurfaceMesh(plane, planeCenter, firstCorner, oppositeCorner);
+			surfaceMesh = new DragSurfaceMesh(plane, planeCenter, _firstCorner, _oppositeCorner);
 		} else {
 			surfaceMesh = new TapSurfaceMesh(plane, planeCenter, FindVerticesOnPlane(plane));
 			if (!surfaceMesh.HasVertices ()) {
@@ -73,13 +66,22 @@ public class TouchController : MonoBehaviour {
 		return true;
 	}
 
+	/// <summary>
+	/// Extends the line renderer end point.
+	/// </summary>
+	/// <param name="end">New end point.</param>
 	private void ExtendLine(Vector3 end) {
 		LineRenderer lr = line.GetComponent<LineRenderer>();
 		lr.SetPosition(1, end);
 	}
 
-		// Narrows point cloud to points on the plane
+	/// <summary>
+	/// Narrows point cloud to points on the plane.
+	/// </summary>
+	/// <returns>All point cloud vertices within a given threshold of the passed plane.</returns>
+	/// <param name="plane">The plane.</param>
 	private List<Vector3> FindVerticesOnPlane(Plane plane) {
+		var planeDistanceThreshold = 0.075f;
 		var verticesOnPlane = new List<Vector3>();
 		for (int i = 0; i < tangoPointCloud.m_pointsCount; i++) {
 			var p = tangoPointCloud.m_points [i];
@@ -90,19 +92,25 @@ public class TouchController : MonoBehaviour {
 		return verticesOnPlane;
 	}
 
+	/// <summary>
+	/// Handles the touch by either selecting a Surface or creating a new one at the given point. 
+	/// </summary>
+	/// <param name="position">Touch position.</param>
 	private void HandleTouch(Vector2 position) {
-		var diagonal = firstCorner - oppositeCorner;
-		if (diagonal.magnitude < 0.1f) { // Treat as a tap
-			//found + (drag || tap) = return //don't care about mode; if we find something, don't create a surface
-			//nothing found + drag = return //don't create tiny surfaces in drag mode
-			//nothing found + tap = create
+		var diagonal = _firstCorner - _oppositeCorner;
+		// Check if user tapped
+		if (diagonal.magnitude < 0.1f) {
 			if (TrySelectSurface (position) || MainMenuController.GetEdgeDetectionMode () == "DRAG") {
 				return;
 			}
 		}
-		CreateSurface (); //FIXME? will create a tap surface if user drags (regardless of mode)
+		CreateSurface (); // Will always create a surface if user drags (regardless of mode)
 	}
 
+	/// <summary>
+	/// Sets line renderer to current touch position (in world space)
+	/// </summary>
+	/// <param name="start">Start point.</param>
 	private void StartLine(Vector3 start)
 	{
 		line.transform.position = start;
@@ -112,6 +120,11 @@ public class TouchController : MonoBehaviour {
 		line.SetActive(true);
 	}
 
+	/// <summary>
+	/// Selects the surface the user tapped on.
+	/// </summary>
+	/// <returns><c>true</c>, if a surface is found at the touch position, <c>false</c> otherwise.</returns>
+	/// <param name="touch">Touch position.</param>
 	private bool TrySelectSurface(Vector2 touch) {
 		//Check if you hit a UI element (http://answers.unity3d.com/questions/821590/unity-46-how-to-raycast-against-ugui-objects-from.html)
 		var pointer = new PointerEventData(EventSystem.current);

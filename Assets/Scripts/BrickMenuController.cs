@@ -10,6 +10,7 @@ public class BrickMenuController : MonoBehaviour {
 	private Surface _trackedSurface;
 
 	void Update() {
+		// Ensures the menu is always centered over the selected surface
 		if (_trackedSurface) {
 			transform.position = Camera.main.WorldToScreenPoint(_trackedSurface.transform.position);
 		}
@@ -19,6 +20,9 @@ public class BrickMenuController : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// Collapses the brick menu and deselects the selected surface.
+	/// </summary>
 	private void CollapseMenu() {
 		if (_trackedSurface) {
 			_trackedSurface.SetMaterial (GetCurrentMaterial ());
@@ -28,14 +32,25 @@ public class BrickMenuController : MonoBehaviour {
 		gameObject.GetComponent<Animation> ().Play ("spiral-in");
 	}
 
+	/// <summary>
+	/// Expands the brick menu.
+	/// </summary>
 	public void ExpandMenu() {
 		gameObject.GetComponent<Animation> ().Play ("spiral-out");
 	}
 
+	/// <summary>
+	/// Gets the current material.
+	/// </summary>
+	/// <returns>The current material.</returns>
 	public Material GetCurrentMaterial () {
 		return brickMaterials [_currentMaterial];
 	}
-		
+
+	/// <summary>
+	/// This function is called when one of the menu options (i.e. brick colors) has been selected by the user.
+	/// </summary>
+	/// <param name="option">Brick color.</param>
 	public void SelectOption(string option) {
 		//NOTE: indices need to match order of items in brickMaterials (e.g. beige material is located at index 0)
 		switch (option) {

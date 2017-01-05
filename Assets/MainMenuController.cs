@@ -19,19 +19,34 @@ public class MainMenuController : MonoBehaviour {
 		GetComponent<Image> ().color = _color;
 	}
 
+	/// <summary>
+	/// Toggles the boolean that opens/closes the drawer menu.
+	/// </summary>
 	public void ToggleMenu() {
 		_isOpen = !_isOpen;
 	}
 
-	private void SlideMenu(float amount) {
-		menuDrawer.transform.position += new Vector3(amount, 0, 0);
-	}
-
+	/// <summary>
+	/// Changes the edge detection mode between tap and drag.
+	/// </summary>
+	/// <param name="mode"><c>DRAG</c> is 0, <c>TAP</c> is 1 (or any non-zero value).</param>
 	public void ChangeEdgeDetectionMode(int mode) {
 		_dragEdgeDetectionMode = (mode == 0);
 	}
 
+	/// <summary>
+	/// Gets the edge detection mode.
+	/// </summary>
+	/// <returns><c>DRAG</c> or <c>TAP<c>.</returns>
 	public static string GetEdgeDetectionMode() {
 		return _dragEdgeDetectionMode ? "DRAG" : "TAP";
+	}
+
+	/// <summary>
+	/// Slides the menu right or left (if negative).
+	/// </summary>
+	/// <param name="amount">Amount in pixels.</param>
+	private void SlideMenu(float amount) {
+		menuDrawer.transform.position += new Vector3(amount, 0, 0);
 	}
 }

@@ -97,6 +97,11 @@ public class TapSurfaceMesh : SurfaceMesh {
 		return vertices.ToArray();
 	}
 
+	/// <summary>
+	/// Converts world vertices to local space. Only works after <c>SetupLocalCoords</c> is called.
+	/// </summary>
+	/// <returns>Vertices converted to local space.</returns>
+	/// <param name="worldVertices">World vertices.</param>
 	private List<Vector3> FindLocalVertices(List<Vector3> worldVertices) {
 		var localVertices = new List<Vector3>();
 		foreach (var worldVertex in worldVertices) {

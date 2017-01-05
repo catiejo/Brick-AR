@@ -7,11 +7,14 @@ public class OcclusionController : MonoBehaviour {
 	public GameObject dynamicMesh;
 	public TangoApplication tango;
 
-	// Use this for initialization
 	void Start () {
 		ToggleOcclusion (false);
 	}
 
+	/// <summary>
+	/// Toggles the occlusion feature (depth panel, dynamic meshing/3D reconstruction).
+	/// </summary>
+	/// <param name="currentState">Turn on if <c>true</c>, off if <c>false</c>.</param>
 	public void ToggleOcclusion(bool currentState) {
 		depthPanel.ToggleDepthPanel (currentState);
 		dynamicMesh.SetActive (currentState);
