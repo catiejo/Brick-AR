@@ -63,7 +63,7 @@ public class TouchController : MonoBehaviour {
 		if (MainMenuController.GetEdgeDetectionMode() == "DRAG") {
 			surfaceMesh = new DragSurfaceMesh(plane, planeCenter, firstCorner, oppositeCorner);
 		} else {
-			surfaceMesh = new TapSurfaceMesh(plane, planeCenter, FindVerticesOnPlane(plane, planeCenter));
+			surfaceMesh = new TapSurfaceMesh(plane, planeCenter, FindVerticesOnPlane(plane));
 			if (!surfaceMesh.HasVertices ()) {
 				debug.text = "No vertices found on the tapped surface. Please try again.";
 				return false;
@@ -78,8 +78,8 @@ public class TouchController : MonoBehaviour {
 		lr.SetPosition(1, end);
 	}
 
-	private List<Vector3> FindVerticesOnPlane(Plane plane, Vector3 planeCenter) {
 		// Narrows point cloud to points on the plane
+	private List<Vector3> FindVerticesOnPlane(Plane plane) {
 		var verticesOnPlane = new List<Vector3>();
 		for (int i = 0; i < tangoPointCloud.m_pointsCount; i++) {
 			var p = tangoPointCloud.m_points [i];
