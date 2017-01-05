@@ -35,11 +35,11 @@ public class TapSurfaceMesh : SurfaceMesh {
 		}
 	}
 
-	public Mesh Create(Plane plane, Vector3 center, List<Vector3> worldVertices) {
+	public TapSurfaceMesh(Plane plane, Vector3 center, List<Vector3> worldVertices) {
 		SetupLocalCoords (plane, center);
 		_worldVertices = worldVertices;
 		Mesh tapSurfaceMesh = CreateMesh ();
-		return tapSurfaceMesh;
+		mesh = tapSurfaceMesh;
 	}
 
 	public override int[] FindTriangles ()

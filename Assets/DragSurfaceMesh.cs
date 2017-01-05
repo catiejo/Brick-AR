@@ -8,12 +8,12 @@ public class DragSurfaceMesh : SurfaceMesh {
 	private Vector3 _firstCorner;
 	private Vector3 _oppositeCorner;
 
-	public Mesh Create(Plane plane, Vector3 center, Vector3 firstCorner, Vector3 oppositeCorner) {
+	public DragSurfaceMesh(Plane plane, Vector3 center, Vector3 firstCorner, Vector3 oppositeCorner) {
 		SetupLocalCoords (plane, center);
 		_firstCorner = firstCorner;
 		_oppositeCorner = oppositeCorner;
-		Mesh tapSurfaceMesh = CreateMesh ();
-		return tapSurfaceMesh;
+		Mesh dragSurfaceMesh = CreateMesh ();
+		mesh = dragSurfaceMesh;
 	}
 
 	public override int[] FindTriangles ()
