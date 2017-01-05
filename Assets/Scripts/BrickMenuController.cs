@@ -2,17 +2,13 @@
 using UnityEngine.UI;
 using System.Collections;
 
-public class NewMenuController : MonoBehaviour {
+public class BrickMenuController : MonoBehaviour {
 	public Text debug;
 	private Surface _trackedSurface;
 	public Material[] brickMaterials;
 	private int _currentMaterial = 0; //defaults to beige
 
-	public Material GetCurrentMaterial () {
-		return brickMaterials [_currentMaterial];
-	}
-
-	public void Update() {
+	void Update() {
 		if (_trackedSurface) {
 			transform.position = Camera.main.WorldToScreenPoint(_trackedSurface.transform.position);
 		}
@@ -20,6 +16,23 @@ public class NewMenuController : MonoBehaviour {
 			_trackedSurface = Surface.selectedSurface;
 			ExpandMenu ();
 		}
+	}
+
+	private void CollapseMenu() {
+		if (_trackedSurface) {
+			_trackedSurface.SetMaterial (GetCurrentMaterial ());
+			_trackedSurface.DeselectSurface ();
+			_trackedSurface = null;
+		}
+		gameObject.GetComponent<Animation> ().Play ("spiral-in");
+	}
+
+	public void ExpandMenu() {
+		gameObject.GetComponent<Animation> ().Play ("spiral-out");
+	}
+
+	public Material GetCurrentMaterial () {
+		return brickMaterials [_currentMaterial];
 	}
 		
 	public void SelectOption(string option) {
@@ -42,19 +55,6 @@ public class NewMenuController : MonoBehaviour {
 				break;
 		}
 		CollapseMenu ();
-	}
-
-	public void ExpandMenu() {
-		gameObject.GetComponent<Animation> ().Play ("spiral-out");
-	}
-
-	private void CollapseMenu() {
-		if (_trackedSurface) {
-			_trackedSurface.SetMaterial (GetCurrentMaterial ());
-			_trackedSurface.DeselectSurface ();
-			_trackedSurface = null;
-		}
-		gameObject.GetComponent<Animation> ().Play ("spiral-in");
 	}
 }
 
