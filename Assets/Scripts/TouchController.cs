@@ -51,33 +51,6 @@ public class TouchController : MonoBehaviour {
 //		}
 	}
 
-	private void StartLine(Vector3 start)
-	{
-		line.transform.position = start;
-		LineRenderer lr = line.GetComponent<LineRenderer>();
-		lr.SetPosition(0, start);
-		lr.SetPosition(1, start);
-		line.SetActive(true);
-	}
-
-	private void ExtendLine(Vector3 end) {
-		LineRenderer lr = line.GetComponent<LineRenderer>();
-		lr.SetPosition(1, end);
-	}
-
-	private void HandleTouch(Vector2 position) {
-		var diagonal = firstCorner - oppositeCorner;
-		if (diagonal.magnitude < 0.1f) { // Treat as a tap
-			//found + (drag || tap) = return //don't care about mode; if we find something, don't create a surface
-			//nothing found + drag = return //don't create tiny surfaces in drag mode
-			//nothing found + tap = create
-			if (TrySelectSurface (position) || MainMenuController.GetEdgeDetectionMode () == "DRAG") {
-				return;
-			}
-		}
-		CreateSurface (); //FIXME? will create a tap surface if user drags (regardless of mode)
-	}
-
 	private bool CreateSurface() {
 		Vector3 planeCenter;
 		Plane plane;
@@ -100,6 +73,11 @@ public class TouchController : MonoBehaviour {
 		return true;
 	}
 
+	private void ExtendLine(Vector3 end) {
+		LineRenderer lr = line.GetComponent<LineRenderer>();
+		lr.SetPosition(1, end);
+	}
+
 	private List<Vector3> FindVerticesOnPlane(Plane plane, Vector3 planeCenter) {
 		// Narrows point cloud to points on the plane
 		var verticesOnPlane = new List<Vector3>();
@@ -110,6 +88,28 @@ public class TouchController : MonoBehaviour {
 			}
 		}
 		return verticesOnPlane;
+	}
+
+	private void HandleTouch(Vector2 position) {
+		var diagonal = firstCorner - oppositeCorner;
+		if (diagonal.magnitude < 0.1f) { // Treat as a tap
+			//found + (drag || tap) = return //don't care about mode; if we find something, don't create a surface
+			//nothing found + drag = return //don't create tiny surfaces in drag mode
+			//nothing found + tap = create
+			if (TrySelectSurface (position) || MainMenuController.GetEdgeDetectionMode () == "DRAG") {
+				return;
+			}
+		}
+		CreateSurface (); //FIXME? will create a tap surface if user drags (regardless of mode)
+	}
+
+	private void StartLine(Vector3 start)
+	{
+		line.transform.position = start;
+		LineRenderer lr = line.GetComponent<LineRenderer>();
+		lr.SetPosition(0, start);
+		lr.SetPosition(1, start);
+		line.SetActive(true);
 	}
 
 	private bool TrySelectSurface(Vector2 touch) {
