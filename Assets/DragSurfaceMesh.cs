@@ -16,7 +16,7 @@ public class DragSurfaceMesh : SurfaceMesh {
 		mesh = dragSurfaceMesh;
 	}
 
-	public override int[] FindTriangles ()
+	protected override int[] FindTriangles ()
 	{
 		var triangles = new List<int>();
 		triangles.Add (0);
@@ -29,7 +29,7 @@ public class DragSurfaceMesh : SurfaceMesh {
 		return triangles.ToArray ();
 	}
 
-	public override Vector3[] FindVertices ()
+	protected override Vector3[] FindVertices ()
 	{
 		//Put vectors in local space
 		var corner1 = transform.InverseTransformPoint(_firstCorner);

@@ -3,14 +3,13 @@ using System.Collections;
 using System.Collections.Generic; //Lists
 
 public abstract class SurfaceMesh : MonoBehaviour {
-	public Vector3 _center;
-	public Plane _plane;
-	public int[] _triangles;
-	public Vector2[] _uv;
-	public Vector3[] _vertices;
+	public Mesh mesh;
 
-	public abstract int[] FindTriangles ();
-	public abstract Vector3[] FindVertices ();
+	protected Vector3 _center;
+	protected Plane _plane;
+	protected int[] _triangles;
+	protected Vector2[] _uv;
+	protected Vector3[] _vertices;
 
 	public Mesh CreateMesh() {
 		// Setup
@@ -24,20 +23,10 @@ public abstract class SurfaceMesh : MonoBehaviour {
 		mesh.vertices = _vertices;
 		mesh.uv = _uv;
 		mesh.triangles = _triangles;
-//		GetComponent<MeshFilter>().mesh = mesh; //should this also be sharedMesh?
-//		GetComponent<MeshCollider>().sharedMesh = mesh;
 		return mesh;
 	}
 
-	public Vector2[] FindUV() {
-		var uv = new List<Vector2> ();
-		foreach (var vertex in _vertices) {
-			uv.Add (vertex * 3.0f); //Add method knows to discard z coordinate
-		} 
-		return uv.ToArray();
-	}
-
-	public bool SetupLocalCoords(Plane plane, Vector3 center) {
+	public bool SetupLocalCoords(Plane plane, Vector3 center) { //FIXME: this is duplicated code from surface
 		_plane = plane;
 		_center = center;
 		//Plane coordinate system
@@ -49,4 +38,18 @@ public abstract class SurfaceMesh : MonoBehaviour {
 		return true;
 	}
 
+	public bool HasVertices() {
+		return _vertices.Length != 0;
+	}
+
+	protected abstract int[] FindTriangles ();
+	protected abstract Vector3[] FindVertices ();
+
+	protected Vector2[] FindUV() {
+		var uv = new List<Vector2> ();
+		foreach (var vertex in _vertices) {
+			uv.Add (vertex * 3.0f); //Add method knows to discard z coordinate
+		} 
+		return uv.ToArray();
+	}
 }

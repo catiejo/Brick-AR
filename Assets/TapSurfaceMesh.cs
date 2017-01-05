@@ -42,7 +42,7 @@ public class TapSurfaceMesh : SurfaceMesh {
 		mesh = tapSurfaceMesh;
 	}
 
-	public override int[] FindTriangles ()
+	protected override int[] FindTriangles ()
 	{
 		var triangles = new List<int> ();
 		//Convert vertices to MIVertices
@@ -64,7 +64,7 @@ public class TapSurfaceMesh : SurfaceMesh {
 		return triangles.ToArray ();
 	}
 
-	public override Vector3[] FindVertices ()
+	protected override Vector3[] FindVertices ()
 	{
 		var vertices = new List<Vector3> ();
 		var localVertices = FindLocalVertices (_worldVertices);
