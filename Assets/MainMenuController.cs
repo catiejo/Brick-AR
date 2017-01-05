@@ -6,7 +6,7 @@ public class MainMenuController : MonoBehaviour {
 	public Image menuDrawer;
 	private Color _color = new Color(0, 0, 0, 0);
 	private bool _isOpen = false;
-	private bool _dragEdgeDetectionMode = true;
+	private static bool _dragEdgeDetectionMode = true;
 
 	void Update () {
 		if (_isOpen && menuDrawer.transform.position.x < 0.0f) {
@@ -31,7 +31,7 @@ public class MainMenuController : MonoBehaviour {
 		_dragEdgeDetectionMode = (mode == 0);
 	}
 
-	public bool GetEdgeDetectionMode() {
-		return _dragEdgeDetectionMode;
+	public static string GetEdgeDetectionMode() {
+		return _dragEdgeDetectionMode ? "DRAG" : "TAP";
 	}
 }
