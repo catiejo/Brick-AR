@@ -21,6 +21,7 @@ public abstract class SurfaceMesh : ScriptableObject {
 	/// If TAP, order is: (Surface) surface, (List<Vector3>) worldVertices.
 	/// </param>
 	public static SurfaceMesh Create (string detectionMode, params object[] init) {
+		//credit: http://answers.unity3d.com/answers/600984/view.html
 		SurfaceMesh surfaceMesh;
 		if (detectionMode == "DRAG") {
 			surfaceMesh = ScriptableObject.CreateInstance<DragSurfaceMesh> ();
