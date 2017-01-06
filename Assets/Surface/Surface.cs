@@ -1,9 +1,6 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
-using MIConvexHull;
 using System.Collections;
-using System.Collections.Generic; //Lists
-using Tango;
+using System.Collections.Generic;
 
 public class Surface : MonoBehaviour {
 	private Vector3 _center;

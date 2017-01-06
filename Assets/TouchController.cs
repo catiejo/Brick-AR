@@ -119,7 +119,7 @@ public class TouchController : MonoBehaviour {
 				return;
 			}
 		}
-		CreateSurface (); // Will always create a surface if user drags (regardless of mode)
+		CreateSurface (); // Will always create a surface if diagonal > 0.1 (regardless of mode)
 	}
 
 	/// <summary>

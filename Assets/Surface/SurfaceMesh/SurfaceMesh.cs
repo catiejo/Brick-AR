@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using System.Collections.Generic; //Lists
+using System.Collections.Generic;
 
 public abstract class SurfaceMesh : ScriptableObject {
 	public Mesh mesh;

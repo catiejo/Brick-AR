@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.UI;
+using System.Collections;
 
 public class MainMenuController : MonoBehaviour {
 	public Image menuDrawer;

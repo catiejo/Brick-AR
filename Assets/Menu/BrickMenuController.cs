@@ -1,10 +1,8 @@
 ﻿using UnityEngine;
-using UnityEngine.UI;
 using System.Collections;
 
 public class BrickMenuController : MonoBehaviour {
 	public Material[] brickMaterials;
-	public Text debug;
 
 	private int _currentMaterial = 0; //defaults to beige
 	private Surface _trackedSurface;
