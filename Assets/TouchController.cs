@@ -16,22 +16,16 @@ public class TouchController : MonoBehaviour {
 	private Vector3 _oppositeCorner;
 
 	void Start() {
-		var planeCenter = new Vector3(1, 1, 1);
-		var plane = new Plane (Quaternion.Euler(30, 60, 70) * -Vector3.forward, planeCenter);
-		_firstCorner = planeCenter + new Vector3 (1, 1, 1);
-		_oppositeCorner = planeCenter + new Vector3 (-1, -1, -1);
+		//Setup manually since we don't have pointcloud
+		var center = new Vector3(1, 1, 1);
+		var plane = new Plane (Quaternion.Euler(30, 60, 70) * -Vector3.forward, center);
+		_firstCorner = center + new Vector3 (1, 1, 1);
+		_oppositeCorner = center + new Vector3 (-1, -1, -1);
+		//Taken from CreateSurface(). Assumes DRAG mode.
 		Surface surface = Instantiate (surfaceTemplate) as Surface;
-		SurfaceMesh surfaceMesh;
-		if (MainMenuController.GetEdgeDetectionMode() == "DRAG") {
-			debug.text = "Drag";
-			surfaceMesh = new DragSurfaceMesh(plane, planeCenter, _firstCorner, _oppositeCorner);
-		} else {
-			surfaceMesh = new TapSurfaceMesh(plane, planeCenter, FindVerticesOnPlane(plane));
-			if (!surfaceMesh.HasVertices ()) {
-				debug.text = "No vertices found on the tapped surface. Please try again.";
-			}
-		}
-		surface.Create (plane, planeCenter, surfaceMesh.mesh);
+		surface.SetTransform (plane, center);
+		SurfaceMesh surfaceMesh = new DragSurfaceMesh(surface, _firstCorner, _oppositeCorner);
+		surface.SetMesh (surfaceMesh.mesh);
 	}
 
 	void Update () {
@@ -64,24 +58,25 @@ public class TouchController : MonoBehaviour {
 	/// </summary>
 	/// <returns><c>true</c>, if Surface was successfully created, <c>false</c> otherwise.</returns>
 	private bool CreateSurface() {
-		Vector3 planeCenter;
+		Vector3 center;
 		Plane plane;
-		if (!tangoPointCloud.FindPlane (Camera.main, Camera.main.WorldToScreenPoint(Vector3.Lerp (_firstCorner, _oppositeCorner, 0.5f)), out planeCenter, out plane)) {
+		if (!tangoPointCloud.FindPlane (Camera.main, Camera.main.WorldToScreenPoint(Vector3.Lerp (_firstCorner, _oppositeCorner, 0.5f)), out center, out plane)) {
 			debug.text = "No surface found. Please try again.";
 			return false;
 		}
 		Surface surface = Instantiate (surfaceTemplate) as Surface;
+		surface.SetTransform (plane, center);
 		SurfaceMesh surfaceMesh;
 		if (MainMenuController.GetEdgeDetectionMode() == "DRAG") {
-			surfaceMesh = new DragSurfaceMesh(plane, planeCenter, _firstCorner, _oppositeCorner);
+			surfaceMesh = new DragSurfaceMesh(surface, _firstCorner, _oppositeCorner);
 		} else {
-			surfaceMesh = new TapSurfaceMesh(plane, planeCenter, FindVerticesOnPlane(plane));
-			if (!surfaceMesh.HasVertices ()) {
+			surfaceMesh = new TapSurfaceMesh(surface, FindVerticesOnPlane(plane));
+			if (!surfaceMesh.IsEmpty ()) {
 				debug.text = "No vertices found on the tapped surface. Please try again.";
 				return false;
 			}
 		}
-		surface.Create (plane, planeCenter, surfaceMesh.mesh);
+		surface.SetMesh (surfaceMesh.mesh);
 		return true;
 	}
 
