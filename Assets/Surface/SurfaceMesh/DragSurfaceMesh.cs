@@ -20,12 +20,12 @@ public class DragSurfaceMesh : SurfaceMesh {
 	{
 		var triangles = new List<int>();
 		triangles.Add (0);
-		triangles.Add (1);
 		triangles.Add (2);
+		triangles.Add (1);
 		//Upper right triangle.   
+		triangles.Add (2);
 		triangles.Add (3);
-		triangles.Add (4);
-		triangles.Add (5);
+		triangles.Add (1);
 		return triangles.ToArray ();
 	}
 
