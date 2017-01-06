@@ -25,7 +25,7 @@ public class TouchController : MonoBehaviour {
 		Surface surface = Instantiate (surfaceTemplate) as Surface;
 		surface.SetTransform (plane, center);
 		SurfaceMesh surfaceMesh = SurfaceMesh.Create(MainMenuController.GetEdgeDetectionMode(), surface, _firstCorner, _oppositeCorner);
-		surface.SetMesh (surfaceMesh.mesh);
+		surface.SetMeshAndSelect (surfaceMesh.mesh);
 	}
 
 	void Update () {
@@ -75,9 +75,10 @@ public class TouchController : MonoBehaviour {
 		}
 		if (surfaceMesh == null || surfaceMesh.IsEmpty ()) {
 			debug.text = "Unable to create the surface. Please try again.";
+			surface.Undo ();
 			return false;
 		}
-		surface.SetMesh (surfaceMesh.mesh);
+		surface.SetMeshAndSelect (surfaceMesh.mesh);
 		return true;
 	}
 
@@ -152,9 +153,9 @@ public class TouchController : MonoBehaviour {
 			var ray = Camera.main.ScreenPointToRay (touch);
 			var layerMask = 1 << LayerMask.NameToLayer("Ignore Raycast"); //http://answers.unity3d.com/questions/8715/how-do-i-use-layermasks.html
 			if (Physics.Raycast (ray.origin, ray.direction, out hit, layerMask)) {
-				SelectableBehavior selected = hit.collider.gameObject.GetComponent<SelectableBehavior> ();
+				var selected = hit.collider.gameObject.GetComponent<Surface> ();
 				if (selected != null) {
-					selected.SelectSurface (selected.associatedSurface);
+					SelectableBehavior.SelectSurface (selected);
 					return true;
 				}
 			}

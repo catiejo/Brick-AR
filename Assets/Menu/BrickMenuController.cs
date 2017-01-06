@@ -12,8 +12,8 @@ public class BrickMenuController : MonoBehaviour {
 		if (_trackedSurface) {
 			transform.position = Camera.main.WorldToScreenPoint(_trackedSurface.transform.position);
 		}
-		if (SelectableBehavior.selectedSurface && _trackedSurface != SelectableBehavior.selectedSurface) {
-			_trackedSurface = SelectableBehavior.selectedSurface;
+		if (SelectableBehavior.GetSelectedSurface() && _trackedSurface != SelectableBehavior.GetSelectedSurface()) {
+			_trackedSurface = SelectableBehavior.GetSelectedSurface();
 			ExpandMenu ();
 		}
 	}

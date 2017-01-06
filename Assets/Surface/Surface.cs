@@ -19,9 +19,10 @@ public class Surface : MonoBehaviour {
 	/// Sets the mesh.
 	/// </summary>
 	/// <param name="mesh">Mesh created by either TapSurfaceMesh or DragSurfaceMesh.</param>
-	public void SetMesh(Mesh mesh) {
+	public void SetMeshAndSelect(Mesh mesh) {
 		GetComponent<MeshFilter>().mesh = mesh; //should this also be sharedMesh?
 		GetComponent<MeshCollider>().sharedMesh = mesh;
+		SelectableBehavior.SelectSurface (this);
 	}
 
 	/// <summary>
