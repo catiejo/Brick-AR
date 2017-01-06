@@ -98,7 +98,17 @@ public class TapSurfaceMesh : SurfaceMesh {
 	}
 
 	/// <summary>
-	/// Converts world vertices to local space. Only works after <c>SetupLocalCoords</c> is called.
+	/// Initialize the DragSurface. Parameters must be in order: surface, worldVertices.
+	/// </summary>
+	protected override void Initialize(params object[] init) {
+		_associatedSurface = (Surface) init [0];
+		_worldVertices = (List<Vector3>) init [1];
+		Mesh dragSurfaceMesh = CreateMesh ();
+		mesh = dragSurfaceMesh;
+	}
+
+	/// <summary>
+	/// Converts world vertices to local space. Only works after <c>Initialize</c> is called.
 	/// </summary>
 	/// <returns>Vertices converted to local space.</returns>
 	/// <param name="worldVertices">World vertices.</param>

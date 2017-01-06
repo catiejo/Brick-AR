@@ -12,6 +12,17 @@ public abstract class SurfaceMesh : ScriptableObject {
 	protected Vector2[] _uv;
 	protected Vector3[] _vertices;
 
+	public static SurfaceMesh Create (string detectionMode, params object[] init) {
+		SurfaceMesh surfaceMesh;
+		if (detectionMode == "DRAG") {
+			surfaceMesh = ScriptableObject.CreateInstance<DragSurfaceMesh> ();
+		} else {
+			surfaceMesh = ScriptableObject.CreateInstance<TapSurfaceMesh> ();
+		}
+		surfaceMesh.Initialize (init);
+		return surfaceMesh;
+	}
+
 	/// <summary>
 	/// Creates the from the vertices, uv, and triangles generated in child classes.
 	/// </summary>
@@ -62,4 +73,6 @@ public abstract class SurfaceMesh : ScriptableObject {
 		} 
 		return uv.ToArray();
 	}
+
+	protected abstract void Initialize (params object[] init);
 }

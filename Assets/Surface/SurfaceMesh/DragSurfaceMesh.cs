@@ -8,14 +8,6 @@ public class DragSurfaceMesh : SurfaceMesh {
 	private Vector3 _firstCorner;
 	private Vector3 _oppositeCorner;
 
-	public DragSurfaceMesh(Surface surface, Vector3 firstCorner, Vector3 oppositeCorner) {
-		_firstCorner = firstCorner;
-		_oppositeCorner = oppositeCorner;
-		_associatedSurface = surface;
-		Mesh dragSurfaceMesh = CreateMesh ();
-		mesh = dragSurfaceMesh;
-	}
-
 	protected override int[] FindTriangles ()
 	{
 		var triangles = new List<int>();
@@ -48,5 +40,16 @@ public class DragSurfaceMesh : SurfaceMesh {
 		corners[3] = new Vector3(max.x, max.y, 0); //top right
 
 		return corners;
+	}
+
+	/// <summary>
+	/// Initialize the DragSurface. Parameters must be in order: surface, firstCorner, oppositeCorner.
+	/// </summary>
+	protected override void Initialize(params object[] init) {
+		_associatedSurface = (Surface) init [0];
+		_firstCorner = (Vector3) init [1];
+		_oppositeCorner = (Vector3) init [2];
+		Mesh dragSurfaceMesh = CreateMesh ();
+		mesh = dragSurfaceMesh;
 	}
 }

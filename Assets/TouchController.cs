@@ -24,7 +24,7 @@ public class TouchController : MonoBehaviour {
 		//Taken from CreateSurface(). Assumes DRAG mode.
 		Surface surface = Instantiate (surfaceTemplate) as Surface;
 		surface.SetTransform (plane, center);
-		SurfaceMesh surfaceMesh = new DragSurfaceMesh(surface, _firstCorner, _oppositeCorner);
+		SurfaceMesh surfaceMesh = SurfaceMesh.Create(MainMenuController.GetEdgeDetectionMode(), surface, _firstCorner, _oppositeCorner);
 		surface.SetMesh (surfaceMesh.mesh);
 	}
 
@@ -66,11 +66,12 @@ public class TouchController : MonoBehaviour {
 		}
 		Surface surface = Instantiate (surfaceTemplate) as Surface;
 		surface.SetTransform (plane, center);
+		var mode = MainMenuController.GetEdgeDetectionMode ();
 		SurfaceMesh surfaceMesh;
-		if (MainMenuController.GetEdgeDetectionMode() == "DRAG") {
-			surfaceMesh = new DragSurfaceMesh(surface, _firstCorner, _oppositeCorner);
+		if (mode == "DRAG") {
+			surfaceMesh = SurfaceMesh.Create(mode, surface, _firstCorner, _oppositeCorner);
 		} else {
-			surfaceMesh = new TapSurfaceMesh(surface, FindVerticesOnPlane(plane));
+			surfaceMesh = SurfaceMesh.Create(mode, surface, FindVerticesOnPlane(plane));
 			if (!surfaceMesh.IsEmpty ()) {
 				debug.text = "No vertices found on the tapped surface. Please try again.";
 				return false;
