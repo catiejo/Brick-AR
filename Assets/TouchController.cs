@@ -24,7 +24,7 @@ public class TouchController : MonoBehaviour {
 		//Taken from CreateSurface(). Assumes DRAG mode.
 		Surface surface = Instantiate (surfaceTemplate) as Surface;
 		surface.SetTransform (plane, center);
-		SurfaceMesh surfaceMesh = SurfaceMesh.Create(MainMenuController.GetEdgeDetectionMode(), surface, _firstCorner, _oppositeCorner);
+		SurfaceMesh surfaceMesh = SurfaceMesh.Create("DRAG", surface, _firstCorner, _oppositeCorner);
 		surface.SetMeshAndSelect (surfaceMesh.mesh);
 	}
 

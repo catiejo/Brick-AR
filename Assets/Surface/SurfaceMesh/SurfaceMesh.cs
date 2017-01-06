@@ -56,7 +56,7 @@ public abstract class SurfaceMesh : ScriptableObject {
 	/// </summary>
 	/// <returns><c>true</c> if this instance has vertices; otherwise, <c>false</c>.</returns>
 	public bool IsEmpty() {
-		return _vertices.Length != 0;
+		return _vertices.Length == 0;
 	}
 
 	/// <summary>
