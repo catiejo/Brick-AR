@@ -35,9 +35,9 @@ public class TapSurfaceMesh : SurfaceMesh {
 		}
 	}
 
-	public TapSurfaceMesh(Plane plane, Vector3 center, List<Vector3> worldVertices) {
-		SetupLocalCoords (plane, center);
+	public TapSurfaceMesh(Surface surface, List<Vector3> worldVertices) {
 		_worldVertices = worldVertices;
+		_associatedSurface = surface;
 		Mesh tapSurfaceMesh = CreateMesh ();
 		mesh = tapSurfaceMesh;
 	}
@@ -105,7 +105,7 @@ public class TapSurfaceMesh : SurfaceMesh {
 	private List<Vector3> FindLocalVertices(List<Vector3> worldVertices) {
 		var localVertices = new List<Vector3>();
 		foreach (var worldVertex in worldVertices) {
-			localVertices.Add(transform.InverseTransformPoint(worldVertex));
+			localVertices.Add(_associatedSurface.transform.InverseTransformPoint(worldVertex));
 		}
 		return localVertices;
 	}

@@ -8,10 +8,10 @@ public class DragSurfaceMesh : SurfaceMesh {
 	private Vector3 _firstCorner;
 	private Vector3 _oppositeCorner;
 
-	public DragSurfaceMesh(Plane plane, Vector3 center, Vector3 firstCorner, Vector3 oppositeCorner) {
-		SetupLocalCoords (plane, center);
+	public DragSurfaceMesh(Surface surface, Vector3 firstCorner, Vector3 oppositeCorner) {
 		_firstCorner = firstCorner;
 		_oppositeCorner = oppositeCorner;
+		_associatedSurface = surface;
 		Mesh dragSurfaceMesh = CreateMesh ();
 		mesh = dragSurfaceMesh;
 	}
@@ -32,9 +32,9 @@ public class DragSurfaceMesh : SurfaceMesh {
 	protected override Vector3[] FindVertices ()
 	{
 		//Put vectors in local space
-		var corner1 = transform.InverseTransformPoint(_firstCorner);
+		var corner1 = _associatedSurface.transform.InverseTransformPoint(_firstCorner);
 		corner1.z = 0;
-		var corner2 = transform.InverseTransformPoint(_oppositeCorner);
+		var corner2 = _associatedSurface.transform.InverseTransformPoint(_oppositeCorner);
 		corner2.z = 0;
 		//Find min/max coordinate values
 		var min = new Vector2(Mathf.Min(corner1.x, corner2.x), Mathf.Min(corner1.y, corner2.y));

@@ -2,9 +2,10 @@
 using System.Collections;
 using System.Collections.Generic; //Lists
 
-public abstract class SurfaceMesh : MonoBehaviour {
+public abstract class SurfaceMesh : ScriptableObject {
 	public Mesh mesh;
 
+	protected Surface _associatedSurface;
 	protected Vector3 _center;
 	protected Plane _plane;
 	protected int[] _triangles;
@@ -31,26 +32,10 @@ public abstract class SurfaceMesh : MonoBehaviour {
 	}
 
 	/// <summary>
-	/// Makes sure coordinate system is the same as the associated Surface.
-	/// </summary>
-	/// <param name="plane">Plane used to create Surface</param>
-	/// <param name="center">Plane center in world space</param>
-	public void SetupLocalCoords(Plane plane, Vector3 center) { //FIXME: this is duplicated code from surface
-		_plane = plane;
-		_center = center;
-		//Plane coordinate system
-		var xaxis = Quaternion.LookRotation(-_plane.normal) * Vector3.right; //Horizontal vector transformed to plane's rotation
-		var yaxis = Vector3.Cross(xaxis, _plane.normal);
-		//Position + Rotation
-		transform.position = _center;
-		transform.rotation = Quaternion.LookRotation (-_plane.normal, yaxis);
-	}
-
-	/// <summary>
-	/// Determines if the mesh is empty (whether or not it has vertices).
+	/// Determines if the mesh is empty by whether or not it has vertices.
 	/// </summary>
 	/// <returns><c>true</c> if this instance has vertices; otherwise, <c>false</c>.</returns>
-	public bool HasVertices() {
+	public bool IsEmpty() {
 		return _vertices.Length != 0;
 	}
 
