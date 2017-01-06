@@ -2,55 +2,70 @@
 using System.Collections;
 
 public class SelectableBehavior : MonoBehaviour {
-	public Surface associatedSurface; // Surface residing in same game object
-	public Color glowColor = Color.white;
-	public static Surface selectedSurface;
+	public static Color glowColor = Color.white;
 
-	private float _glowAmount;
+	private static SelectableBehavior _instance;
+	private static float _maxGlowAmount = 0.25f;
+	private static Surface _selectedSurface;
 
-	void Start() {
-		associatedSurface = gameObject.GetComponent<Surface>();
-		SelectSurface (associatedSurface);
-	}
-
-	/// <summary>
-	/// Selects a new selectedSurface.
-	/// </summary>
-	/// <param name="selected">The surface to be selected.</param>
-	public void SelectSurface(Surface selected) {
-		if (selectedSurface && selectedSurface != selected) {
-			DeselectSurface ();
-		}
-		selectedSurface = selected;
-		StartCoroutine (Glow ());
+	void Awake() {
+		_instance = this; //set our static reference to our newly initialized instance
 	}
 
 	/// <summary>
 	/// Deselects the current selectedSurface.
 	/// </summary>
 	public static void DeselectSurface() {
-		Material material = selectedSurface.GetComponent<Renderer>().material;
+		Material material = _selectedSurface.GetComponent<Renderer>().material;
 		material.DisableKeyword("_EMISSION");
 		material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack;
 		material.SetColor("_EmissionColor", Color.black);
-		selectedSurface = null;
+		_selectedSurface = null;
+	}
+
+	/// <summary>
+	/// Wrapper to prevent other classes from writing to the selected surface.
+	/// </summary>
+	/// <returns>The selected surface.</returns>
+	public static Surface GetSelectedSurface() {
+		return _selectedSurface;
+	}
+
+	/// <summary>
+	/// Selects a new selectedSurface.
+	/// </summary>
+	/// <param name="selected">The surface to be selected.</param>
+	public static void SelectSurface(Surface surface) {
+		if (_selectedSurface && _selectedSurface != surface) {
+			DeselectSurface ();
+		}
+		_selectedSurface = surface;
+		Glow ();
+	}
+
+	/// <summary>
+	/// Make the selected surface glow.
+	/// </summary>
+	private static void Glow() {
+		//credit: flaminghairball's answer to https://forum.unity3d.com/threads/c-coroutines-in-static-functions.134546/
+		_instance.StartCoroutine("GlowRoutine");
 	}
 
 	/// <summary>
 	/// Makes the selectedSurface glow.
 	/// </summary>
-	private IEnumerator Glow()
+	private static IEnumerator GlowRoutine()
 	{
 		// Setup
-		Material material = selectedSurface.GetComponent<Renderer>().material;
+		Material material = _selectedSurface.GetComponent<Renderer>().material;
 		material.EnableKeyword("_EMISSION");
 		material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
 		// Increase intensity (fade in)
-		_glowAmount = 0;
-		while (_glowAmount < 0.25)
+		var glowAmount = 0.0f;
+		while (glowAmount < _maxGlowAmount)
 		{
-			material.SetColor("_EmissionColor", glowColor * _glowAmount);
-			_glowAmount += 0.01f;
+			material.SetColor("_EmissionColor", glowColor * glowAmount);
+			glowAmount += 0.01f;
 			yield return new WaitForSeconds(0.01f);
 		}
 	}
