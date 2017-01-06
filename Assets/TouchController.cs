@@ -72,10 +72,10 @@ public class TouchController : MonoBehaviour {
 			surfaceMesh = SurfaceMesh.Create(mode, surface, _firstCorner, _oppositeCorner);
 		} else {
 			surfaceMesh = SurfaceMesh.Create(mode, surface, FindVerticesOnPlane(plane));
-			if (!surfaceMesh.IsEmpty ()) {
-				debug.text = "No vertices found on the tapped surface. Please try again.";
-				return false;
-			}
+		}
+		if (surfaceMesh == null || surfaceMesh.IsEmpty ()) {
+			debug.text = "Unable to create the surface. Please try again.";
+			return false;
 		}
 		surface.SetMesh (surfaceMesh.mesh);
 		return true;

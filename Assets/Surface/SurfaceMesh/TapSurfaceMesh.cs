@@ -100,11 +100,16 @@ public class TapSurfaceMesh : SurfaceMesh {
 	/// <summary>
 	/// Initialize the DragSurface. Parameters must be in order: surface, worldVertices.
 	/// </summary>
-	protected override void Initialize(params object[] init) {
+	protected override bool Initialize(params object[] init) {
+		if (init.Length != 2) {
+			Debug.LogError ("Incorrect number of arguments called. Must be in order: (Surface) surface, (List<Vector3>) worldVertices");
+			return false;
+		}
 		_associatedSurface = (Surface) init [0];
 		_worldVertices = (List<Vector3>) init [1];
 		Mesh dragSurfaceMesh = CreateMesh ();
 		mesh = dragSurfaceMesh;
+		return true;
 	}
 
 	/// <summary>

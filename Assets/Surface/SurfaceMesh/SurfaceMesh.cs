@@ -12,6 +12,14 @@ public abstract class SurfaceMesh : ScriptableObject {
 	protected Vector2[] _uv;
 	protected Vector3[] _vertices;
 
+	/// <summary>
+	/// Create the appropriate SurfaceMesh initialized with init params.
+	/// </summary>
+	/// <param name="detectionMode">Edge detection mode. Either "TAP" or "DRAG".</param>
+	/// <param name="init">
+	/// If DRAG, params must be ordered: (Surface) surface, (Vector3) firstCorner, (Vector3) oppositeCorner. 
+	/// If TAP, order is: (Surface) surface, (List<Vector3>) worldVertices.
+	/// </param>
 	public static SurfaceMesh Create (string detectionMode, params object[] init) {
 		SurfaceMesh surfaceMesh;
 		if (detectionMode == "DRAG") {
@@ -19,8 +27,8 @@ public abstract class SurfaceMesh : ScriptableObject {
 		} else {
 			surfaceMesh = ScriptableObject.CreateInstance<TapSurfaceMesh> ();
 		}
-		surfaceMesh.Initialize (init);
-		return surfaceMesh;
+		var success = surfaceMesh.Initialize (init);
+		return success ? surfaceMesh : null;
 	}
 
 	/// <summary>
@@ -74,5 +82,5 @@ public abstract class SurfaceMesh : ScriptableObject {
 		return uv.ToArray();
 	}
 
-	protected abstract void Initialize (params object[] init);
+	protected abstract bool Initialize (params object[] init);
 }

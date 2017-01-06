@@ -45,11 +45,16 @@ public class DragSurfaceMesh : SurfaceMesh {
 	/// <summary>
 	/// Initialize the DragSurface. Parameters must be in order: surface, firstCorner, oppositeCorner.
 	/// </summary>
-	protected override void Initialize(params object[] init) {
+	protected override bool Initialize(params object[] init) {
+		if (init.Length != 3) {
+			Debug.LogError ("Incorrect number of arguments called. Must be in order: (Surface) surface, (Vector3) firstCorner, (Vector3) oppositeCorner");
+			return false;
+		}
 		_associatedSurface = (Surface) init [0];
 		_firstCorner = (Vector3) init [1];
 		_oppositeCorner = (Vector3) init [2];
 		Mesh dragSurfaceMesh = CreateMesh ();
 		mesh = dragSurfaceMesh;
+		return true;
 	}
 }
