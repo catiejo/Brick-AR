@@ -15,6 +15,25 @@ public class TouchController : MonoBehaviour {
 	private bool _hasStartPoint = false;
 	private Vector3 _oppositeCorner;
 
+	void Start() {
+		var planeCenter = new Vector3(1, 1, 1);
+		var plane = new Plane (Quaternion.Euler(30, 60, 70) * -Vector3.forward, planeCenter);
+		_firstCorner = planeCenter + new Vector3 (1, 1, 1);
+		_oppositeCorner = planeCenter + new Vector3 (-1, -1, -1);
+		Surface surface = Instantiate (surfaceTemplate) as Surface;
+		SurfaceMesh surfaceMesh;
+		if (MainMenuController.GetEdgeDetectionMode() == "DRAG") {
+			debug.text = "Drag";
+			surfaceMesh = new DragSurfaceMesh(plane, planeCenter, _firstCorner, _oppositeCorner);
+		} else {
+			surfaceMesh = new TapSurfaceMesh(plane, planeCenter, FindVerticesOnPlane(plane));
+			if (!surfaceMesh.HasVertices ()) {
+				debug.text = "No vertices found on the tapped surface. Please try again.";
+			}
+		}
+		surface.Create (plane, planeCenter, surfaceMesh.mesh);
+	}
+
 	void Update () {
 		if (Input.touchCount > 0)
 		{	
