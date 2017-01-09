@@ -48,7 +48,7 @@ public class SelectableBehavior : MonoBehaviour {
 	/// </summary>
 	private static void Glow() {
 		//credit: flaminghairball's answer to https://forum.unity3d.com/threads/c-coroutines-in-static-functions.134546/
-		_instance.StartCoroutine("GlowRoutine");
+		_instance.StartCoroutine(GlowRoutine());
 	}
 
 	/// <summary>
