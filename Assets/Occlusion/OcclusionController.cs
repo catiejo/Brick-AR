@@ -34,9 +34,20 @@ public class OcclusionController : MonoBehaviour {
 			tango.m_3drUseAreaDescriptionPose = false;
 			tango.m_3drMinNumVertices = 20;
 		}
+		SwitchMaterials ();
 	}
 
 	public static bool IsOccluding() {
 		return _isOccluding;
+	}
+
+	//HACK Also in Surface
+	private void SwitchMaterials() {
+		var gameObjects = GameObject.FindGameObjectsWithTag ("Surface");
+		foreach (var go in gameObjects) {
+			var surface = go.GetComponent<Surface> ();
+			brickMenu.SelectOption (surface.GetBrickColor ());
+			surface.SetMaterial (brickMenu.GetCurrentMaterial());
+		}
 	}
 }

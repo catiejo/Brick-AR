@@ -4,14 +4,23 @@ using System.Collections.Generic;
 
 public class Surface : MonoBehaviour {
 	private Vector3 _center;
+	private string _color;
 	private Plane _plane;
 	private Mesh _mesh;
+
+	/// <summary>
+	/// Gets the Surface's brick color.
+	/// </summary>
+	public string GetBrickColor() {
+		return _color;
+	}
 
 	/// <summary>
 	/// Sets the brick material of the Surface.
 	/// </summary>
 	/// <param name="material">Brick material.</param>
 	public void SetMaterial(Material material) {
+		_color = material.name.Replace("Occluded", "");
 		GetComponent<MeshRenderer> ().material = material;
 	}
 
