@@ -3,6 +3,7 @@
 	Properties
 	{
 		_MainTex ("Texture", 2D) = "white" {}
+		_Density ("Density", Range(2,50)) = 30
 	}
     SubShader
     {
@@ -26,19 +27,21 @@
             {
                 float4 pos : SV_POSITION;
                 float4 projPos : TEXCOORD1; //Screen position of pos
-//                float2 uv : TEXCOORD0;
+                float2 uv : TEXCOORD0;
             };
- 
-            v2f vert(appdata_base v)
+
+            float _Density;
+
+            v2f vert(float4 pos : POSITION, float2 uv : TEXCOORD0)
             {
                 v2f o;
-                o.pos = mul(UNITY_MATRIX_MVP, v.vertex);
+                o.pos = mul(UNITY_MATRIX_MVP, pos);
                 o.projPos = ComputeScreenPos(o.pos);
-// 				o.uv = v.uv;
+ 				o.uv = uv * _Density;
                 return o;
             }
  
-            half4 frag(v2f i) : COLOR
+            fixed4 frag(v2f i) : SV_Target
             {
                 //Grab the depth value from the depth texture
                 //Linear01Depth restricts this value to [0, 1]
@@ -49,15 +52,18 @@
                 if (abs(localDepth - depth) > 0.02) {
                 	discard;
                 }
+
+                float2 c = i.uv;
+                c = floor(c) / 2;
+                float checker = frac(c.x + c.y) * 2;
+                return checker;
                                        
-            	half4 c;
-                c.r = depth;
-                c.g = 1 - depth;
-                c.b = 1 - depth;
-                c.a = 1;
- 
-//                return tex2D(_MainTex, i.uv);
-                return c;
+//            	half4 c;
+//                c.r = depth;
+//                c.g = 1 - depth;
+//                c.b = 1 - depth;
+//                c.a = 1;
+//                return c;
             }
  
             ENDCG
