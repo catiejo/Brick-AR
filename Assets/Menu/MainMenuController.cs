@@ -15,8 +15,15 @@ public class MainMenuController : MonoBehaviour {
 			SlideMenu (-100f);
 		}
 		var alpha = 1 + Mathf.Clamp(menuDrawer.transform.position.x / 500.0f, -1.0f, -0.4f);
-		_color = new Color (0, 0, 0, alpha);
-		GetComponent<Image> ().color = _color;
+		// Enabling and disabling background so it doesn't affect UI raycast
+		var background = GetComponent<Image> ();
+		if (alpha == 0) {
+			background.enabled = false;
+		} else {
+			background.enabled = true;
+			_color = new Color (0, 0, 0, alpha);
+			background.color = _color;
+		}
 	}
 
 	/// <summary>
