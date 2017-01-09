@@ -3,6 +3,7 @@ using System.Collections;
 
 public class BrickMenuController : MonoBehaviour {
 	public Material[] brickMaterials;
+	public Material[] brickMaterialsOccluded;
 
 	private int _currentMaterial = 0; //defaults to beige
 	private Surface _trackedSurface;
@@ -42,7 +43,11 @@ public class BrickMenuController : MonoBehaviour {
 	/// </summary>
 	/// <returns>The current material.</returns>
 	public Material GetCurrentMaterial () {
-		return brickMaterials [_currentMaterial];
+		if (OcclusionController.IsOccluding ()) {
+			return brickMaterialsOccluded [_currentMaterial];
+		} else {
+			return brickMaterials [_currentMaterial];
+		}
 	}
 
 	/// <summary>

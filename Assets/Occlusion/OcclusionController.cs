@@ -7,6 +7,8 @@ public class OcclusionController : MonoBehaviour {
 	public Toggle depthPanelToggle;
 	public GameObject dynamicMesh;
 	public TangoApplication tango;
+	public BrickMenuController brickMenu;
+	private static bool _isOccluding;
 
 	void Start () {
 		ToggleOcclusion (false);
@@ -17,6 +19,7 @@ public class OcclusionController : MonoBehaviour {
 	/// </summary>
 	/// <param name="currentState">Turn on if <c>true</c>, off if <c>false</c>.</param>
 	public void ToggleOcclusion(bool currentState) {
+		_isOccluding = currentState;
 		depthPanelToggle.isOn = false;
 		depthPanelToggle.interactable = currentState;
 		dynamicMesh.SetActive (currentState);
@@ -31,5 +34,9 @@ public class OcclusionController : MonoBehaviour {
 			tango.m_3drUseAreaDescriptionPose = false;
 			tango.m_3drMinNumVertices = 20;
 		}
+	}
+
+	public static bool IsOccluding() {
+		return _isOccluding;
 	}
 }
