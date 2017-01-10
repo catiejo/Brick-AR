@@ -10,9 +10,9 @@ public class OcclusionController : MonoBehaviour {
 	public BrickMenuController brickMenu;
 	private static bool _isOccluding;
 
-//	void Start () {
-//		ToggleOcclusion (false);
-//	}
+	void Start () {
+		ToggleOcclusion (false);
+	}
 
 	/// <summary>
 	/// Toggles the occlusion feature (depth panel, dynamic meshing/3D reconstruction).
@@ -44,10 +44,13 @@ public class OcclusionController : MonoBehaviour {
 	//HACK Also in Surface
 	private void SwitchMaterials() {
 		var gameObjects = GameObject.FindGameObjectsWithTag ("Surface");
+		var count = 0;
 		foreach (var go in gameObjects) {
 			var surface = go.GetComponent<Surface> ();
 			brickMenu.SelectOption (surface.GetBrickColor ());
 			surface.SetMaterial (brickMenu.GetCurrentMaterial());
+			count++;
 		}
+
 	}
 }

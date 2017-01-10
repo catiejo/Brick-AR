@@ -1,12 +1,10 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 using Tango;
 
 public class TouchController : MonoBehaviour {
-	public Text debug;
 	public GameObject line;
 	public Surface surfaceTemplate;
 	public TangoPointCloud tangoPointCloud;
@@ -16,6 +14,7 @@ public class TouchController : MonoBehaviour {
 	private Vector3 _oppositeCorner;
 
 //	void Start() {
+//		ScreenLog.Write ("Created manual Surface. Disable before launching to production.");
 //		//Setup manually since we don't have pointcloud
 //		var center = new Vector3(1, 1, 1);
 //		var plane = new Plane (Quaternion.Euler(30, 60, 70) * -Vector3.forward, center);
@@ -61,7 +60,7 @@ public class TouchController : MonoBehaviour {
 		Vector3 center;
 		Plane plane;
 		if (!tangoPointCloud.FindPlane (Camera.main, Camera.main.WorldToScreenPoint(Vector3.Lerp (_firstCorner, _oppositeCorner, 0.5f)), out center, out plane)) {
-			debug.text = "No surface found. Please try again.";
+			ScreenLog.Write("No surface found. Please try again.");
 			return false;
 		}
 		Surface surface = Instantiate (surfaceTemplate) as Surface;
@@ -74,7 +73,7 @@ public class TouchController : MonoBehaviour {
 			surfaceMesh = SurfaceMesh.Create(mode, surface, FindVerticesOnPlane(plane));
 		}
 		if (surfaceMesh == null || surfaceMesh.IsEmpty ()) {
-			debug.text = "Unable to create the surface. Please try again.";
+			ScreenLog.Write("Unable to create the surface. Please try again.");
 			surface.Undo ();
 			return false;
 		}
