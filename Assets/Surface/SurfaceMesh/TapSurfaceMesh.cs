@@ -9,7 +9,7 @@ public class TapSurfaceMesh : SurfaceMesh {
 	private float neighborDistanceThreshold = 0.000175f;
 	private List<Vector3> _worldVertices;
 	//Helper class for kdTree
-	public class Point : MonoBehaviour
+	public class Point
 	{
 		public double[] doublePosition;
 		public Vector3 vectorPosition;
@@ -107,8 +107,8 @@ public class TapSurfaceMesh : SurfaceMesh {
 		}
 		_associatedSurface = (Surface) init [0];
 		_worldVertices = (List<Vector3>) init [1];
-		Mesh dragSurfaceMesh = CreateMesh ();
-		mesh = dragSurfaceMesh;
+		Mesh tapSurfaceMesh = CreateMesh ();
+		mesh = tapSurfaceMesh;
 		return true;
 	}
 
