@@ -5,8 +5,6 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class TapSurfaceMesh : SurfaceMesh {
-	private int neighborCountThreshold = 4;
-	private float neighborDistanceThreshold = 0.000175f;
 	private List<Vector3> _worldVertices;
 	//Helper class for kdTree
 	public class Point
@@ -66,6 +64,10 @@ public class TapSurfaceMesh : SurfaceMesh {
 
 	protected override Vector3[] FindVertices ()
 	{
+		//Moved from global vars because they were getting set to zero despite being initialized with non-zero values
+		var neighborCountThreshold = 4;
+		var neighborDistanceThreshold = 0.000175f;
+
 		var vertices = new List<Vector3> ();
 		var localVertices = FindLocalVertices (_worldVertices);
 
@@ -83,9 +85,10 @@ public class TapSurfaceMesh : SurfaceMesh {
 			var neighbors = kdTree.NearestNeighbors(currentPoint.doublePosition, neighborCountThreshold, neighborDistanceThreshold);
 			int neighborCount = 0;
 			while (neighbors.MoveNext()) {
-				if (!neighbors.Current.visited) {
-					pointsToCheck.Enqueue (neighbors.Current);
-					neighbors.Current.visited = true;
+				var point = neighbors.Current;
+				if (!point.visited) {
+					pointsToCheck.Enqueue (point);
+					point.visited = true;
 				}
 				neighborCount++;
 			}
