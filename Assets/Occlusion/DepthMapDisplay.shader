@@ -1,4 +1,4 @@
-﻿Shader "CatieJo/DepthMapDisplay"
+﻿Shader "CatieJo/Depth Map Display"
 {
     SubShader
     {
