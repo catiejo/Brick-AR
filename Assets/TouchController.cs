@@ -3,8 +3,10 @@ using UnityEngine.EventSystems;
 using System.Collections;
 using System.Collections.Generic;
 using Tango;
+using System.Linq;
 
 public class TouchController : MonoBehaviour {
+	public MeshFilter sphere;
 	public GameObject line;
 	public Surface surfaceTemplate;
 	public TangoPointCloud tangoPointCloud;
@@ -14,16 +16,21 @@ public class TouchController : MonoBehaviour {
 	private Vector3 _oppositeCorner;
 
 //	void Start() {
-//		ScreenLog.Write ("Created manual Surface. Disable before launching to production.");
 //		//Setup manually since we don't have pointcloud
 //		var center = new Vector3(1, 1, 1);
 //		var plane = new Plane (Quaternion.Euler(30, 60, 70) * -Vector3.forward, center);
-//		_firstCorner = center + new Vector3 (1, 1, 1);
-//		_oppositeCorner = center + new Vector3 (-1, -1, -1);
-//		//Taken from CreateSurface(). Assumes DRAG mode.
 //		Surface surface = Instantiate (surfaceTemplate) as Surface;
 //		surface.SetTransform (plane, center);
-//		SurfaceMesh surfaceMesh = SurfaceMesh.Create("DRAG", surface, _firstCorner, _oppositeCorner);
+//		SurfaceMesh surfaceMesh;
+//		//Vertices
+//		_firstCorner = center + new Vector3 (1, 1, 1);
+//		_oppositeCorner = center + new Vector3 (-1, -1, -1);
+//
+//		ScreenLog.Write ("Created manual DRAG Surface. Disable before launching to production.");
+//		surfaceMesh = SurfaceMesh.Create("DRAG", surface, _firstCorner, _oppositeCorner);
+//		surface.SetMeshAndSelect (surfaceMesh.mesh);
+//		ScreenLog.Write ("Created manual TAP Surface. Disable before launching to production.");
+//		surfaceMesh = SurfaceMesh.Create("TAP", surface, sphere.mesh.vertices.ToList());
 //		surface.SetMeshAndSelect (surfaceMesh.mesh);
 //	}
 
@@ -71,6 +78,8 @@ public class TouchController : MonoBehaviour {
 			surfaceMesh = SurfaceMesh.Create(mode, surface, _firstCorner, _oppositeCorner);
 		} else {
 			surfaceMesh = SurfaceMesh.Create(mode, surface, FindVerticesOnPlane(plane));
+			string message = "Created a tap surface mesh with " + surfaceMesh.mesh.vertexCount.ToString () + " vertices."; //Why doesn't this display?!
+			ScreenLog.Write (message);
 		}
 		if (surfaceMesh == null || surfaceMesh.IsEmpty ()) {
 			ScreenLog.Write("Unable to create the surface. Please try again.");

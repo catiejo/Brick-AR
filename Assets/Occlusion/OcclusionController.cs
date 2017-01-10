@@ -10,15 +10,17 @@ public class OcclusionController : MonoBehaviour {
 	public BrickMenuController brickMenu;
 	private static bool _isOccluding;
 
-	void Start () {
-		ToggleOcclusion (false);
-	}
+//	//WHAT THE ACTUAL FUCK
+//	void Start () {
+//		ToggleOcclusion (false);
+//	}
 
 	/// <summary>
 	/// Toggles the occlusion feature (depth panel, dynamic meshing/3D reconstruction).
 	/// </summary>
 	/// <param name="currentState">Turn on if <c>true</c>, off if <c>false</c>.</param>
 	public void ToggleOcclusion(bool currentState) {
+		ScreenLog.Write ("occlusion toggled");
 		_isOccluding = currentState;
 		depthPanelToggle.isOn = false;
 		depthPanelToggle.interactable = currentState;
@@ -34,7 +36,7 @@ public class OcclusionController : MonoBehaviour {
 			tango.m_3drMinNumVertices = 20;
 		}
 		dynamicMesh.SetActive (currentState);
-		SwitchMaterials ();
+//		SwitchMaterials ();
 	}
 
 	public static bool IsOccluding() {

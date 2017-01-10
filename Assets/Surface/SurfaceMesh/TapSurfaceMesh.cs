@@ -105,6 +105,7 @@ public class TapSurfaceMesh : SurfaceMesh {
 			Debug.LogError ("Incorrect number of arguments called. Must be in order: (Surface) surface, (List<Vector3>) worldVertices");
 			return false;
 		}
+		ScreenLog.Write ("Initalizing");
 		_associatedSurface = (Surface) init [0];
 		_worldVertices = (List<Vector3>) init [1];
 		Mesh tapSurfaceMesh = CreateMesh ();
