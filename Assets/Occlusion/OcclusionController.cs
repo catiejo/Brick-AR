@@ -10,10 +10,10 @@ public class OcclusionController : MonoBehaviour {
 	public BrickMenuController brickMenu;
 	private static bool _isOccluding;
 
-//	//WHAT THE ACTUAL FUCK
-//	void Start () {
-//		ToggleOcclusion (false);
-//	}
+	//WHAT THE ACTUAL FUCK
+	void Start () {
+		ToggleOcclusion (true);
+	}
 
 	/// <summary>
 	/// Toggles the occlusion feature (depth panel, dynamic meshing/3D reconstruction).
