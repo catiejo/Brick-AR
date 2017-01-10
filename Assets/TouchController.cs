@@ -15,18 +15,18 @@ public class TouchController : MonoBehaviour {
 	private bool _hasStartPoint = false;
 	private Vector3 _oppositeCorner;
 
-	void Start() {
-		//Setup manually since we don't have pointcloud
-		var center = new Vector3(1, 1, 1);
-		var plane = new Plane (Quaternion.Euler(30, 60, 70) * -Vector3.forward, center);
-		_firstCorner = center + new Vector3 (1, 1, 1);
-		_oppositeCorner = center + new Vector3 (-1, -1, -1);
-		//Taken from CreateSurface(). Assumes DRAG mode.
-		Surface surface = Instantiate (surfaceTemplate) as Surface;
-		surface.SetTransform (plane, center);
-		SurfaceMesh surfaceMesh = SurfaceMesh.Create("DRAG", surface, _firstCorner, _oppositeCorner);
-		surface.SetMeshAndSelect (surfaceMesh.mesh);
-	}
+//	void Start() {
+//		//Setup manually since we don't have pointcloud
+//		var center = new Vector3(1, 1, 1);
+//		var plane = new Plane (Quaternion.Euler(30, 60, 70) * -Vector3.forward, center);
+//		_firstCorner = center + new Vector3 (1, 1, 1);
+//		_oppositeCorner = center + new Vector3 (-1, -1, -1);
+//		//Taken from CreateSurface(). Assumes DRAG mode.
+//		Surface surface = Instantiate (surfaceTemplate) as Surface;
+//		surface.SetTransform (plane, center);
+//		SurfaceMesh surfaceMesh = SurfaceMesh.Create("DRAG", surface, _firstCorner, _oppositeCorner);
+//		surface.SetMeshAndSelect (surfaceMesh.mesh);
+//	}
 
 	void Update () {
 		if (Input.touchCount > 0)
@@ -36,11 +36,11 @@ public class TouchController : MonoBehaviour {
 			Vector3 closestPoint = tangoPointCloud.m_points [closestPointIndex]; // Returns -1 if not found
 			if (closestPointIndex != -1) {
 				if (!_hasStartPoint) {
-					StartLine (closestPoint);
+					if (OcclusionController.IsOccluding ()) { StartLine (closestPoint); }
 					_firstCorner = closestPoint;
 					_hasStartPoint = true;
 				}
-				ExtendLine (closestPoint);
+				if (OcclusionController.IsOccluding()) { ExtendLine (closestPoint); }
 				_oppositeCorner = closestPoint;
 			}
 			if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled) {

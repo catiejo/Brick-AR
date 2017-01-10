@@ -4,6 +4,7 @@ using System.Collections;
 
 public class MainMenuController : MonoBehaviour {
 	public Image menuDrawer;
+	public Text debug;
 	private Color _color = new Color(0, 0, 0, 0);
 	private bool _isOpen = false;
 	private static bool _dragEdgeDetectionMode = true;
@@ -39,6 +40,7 @@ public class MainMenuController : MonoBehaviour {
 	/// <param name="mode"><c>DRAG</c> is 0, <c>TAP</c> is 1 (or any non-zero value).</param>
 	public void ChangeEdgeDetectionMode(int mode) {
 		_dragEdgeDetectionMode = (mode == 0);
+		debug.text = "Mode changed to " + (_dragEdgeDetectionMode ? "DRAG " : "TAP ") + "mode.";
 	}
 
 	/// <summary>
