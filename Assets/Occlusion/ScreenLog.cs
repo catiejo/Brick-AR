@@ -13,7 +13,7 @@ public class ScreenLog : MonoBehaviour {
 	}
 
 	public static void Write(string message) {
-		_instance.text = message;
+		_instance.text += "\n" + message;
 	}
 
 	public static void Clear() {

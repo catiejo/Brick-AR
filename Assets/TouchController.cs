@@ -78,8 +78,6 @@ public class TouchController : MonoBehaviour {
 			surfaceMesh = SurfaceMesh.Create(mode, surface, _firstCorner, _oppositeCorner);
 		} else {
 			surfaceMesh = SurfaceMesh.Create(mode, surface, FindVerticesOnPlane(plane));
-			string message = "Created a tap surface mesh with " + surfaceMesh.mesh.vertexCount.ToString () + " vertices."; //Why doesn't this display?!
-			ScreenLog.Write (message);
 		}
 		if (surfaceMesh == null || surfaceMesh.IsEmpty ()) {
 			ScreenLog.Write("Unable to create the surface. Please try again.");
@@ -87,6 +85,7 @@ public class TouchController : MonoBehaviour {
 			return false;
 		}
 		surface.SetMeshAndSelect (surfaceMesh.mesh);
+		ScreenLog.Write ("Mesh successfully built");
 		return true;
 	}
 
@@ -113,6 +112,7 @@ public class TouchController : MonoBehaviour {
 				verticesOnPlane.Add (p);
 			}
 		}
+		ScreenLog.Write ("Found " + verticesOnPlane.Count + " vertices on plane");
 		return verticesOnPlane;
 	}
 
@@ -121,6 +121,7 @@ public class TouchController : MonoBehaviour {
 	/// </summary>
 	/// <param name="position">Touch position.</param>
 	private void HandleTouch(Vector2 position) {
+		ScreenLog.Clear ();
 		if (TouchIsOnUI (position)) {
 			return;
 		}

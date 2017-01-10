@@ -32,7 +32,6 @@ public class Surface : MonoBehaviour {
 		GetComponent<MeshFilter>().mesh = mesh; //should this also be sharedMesh?
 		GetComponent<MeshCollider>().sharedMesh = mesh;
 		SelectableBehavior.SelectSurface (this);
-		ScreenLog.Write ("Mesh set and surface selected");
 	}
 
 	/// <summary>
