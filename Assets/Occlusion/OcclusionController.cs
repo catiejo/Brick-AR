@@ -22,7 +22,6 @@ public class OcclusionController : MonoBehaviour {
 		_isOccluding = currentState;
 		depthPanelToggle.isOn = false;
 		depthPanelToggle.interactable = currentState;
-		dynamicMesh.SetActive (currentState);
 		tango.m_enable3DReconstruction = currentState;
 		if (currentState) {
 			tango.m_3drUpdateMethod = Tango3DReconstruction.UpdateMethod.PROJECTIVE;
@@ -34,6 +33,7 @@ public class OcclusionController : MonoBehaviour {
 			tango.m_3drUseAreaDescriptionPose = false;
 			tango.m_3drMinNumVertices = 20;
 		}
+		dynamicMesh.SetActive (currentState);
 		SwitchMaterials ();
 	}
 
