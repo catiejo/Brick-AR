@@ -112,8 +112,11 @@ public class TouchController : MonoBehaviour {
 	/// </summary>
 	/// <param name="position">Touch position.</param>
 	private void HandleTouch(Vector2 position) {
-		var diagonal = _firstCorner - _oppositeCorner;
+		if (TouchIsOnUI (position)) {
+			return;
+		}
 		// Check if user tapped
+		var diagonal = _firstCorner - _oppositeCorner;
 		if (diagonal.magnitude < 0.1f) {
 			if (TrySelectSurface (position) || MainMenuController.GetEdgeDetectionMode () == "DRAG") {
 				return;
@@ -141,24 +144,26 @@ public class TouchController : MonoBehaviour {
 	/// <returns><c>true</c>, if a surface is found at the touch position, <c>false</c> otherwise.</returns>
 	/// <param name="touch">Touch position.</param>
 	private bool TrySelectSurface(Vector2 touch) {
+		//Check if you hit a surface
+		RaycastHit hit;
+		var ray = Camera.main.ScreenPointToRay (touch);
+		var layerMask = 1 << LayerMask.NameToLayer("Ignore Raycast"); //http://answers.unity3d.com/questions/8715/how-do-i-use-layermasks.html
+		if (Physics.Raycast (ray.origin, ray.direction, out hit, layerMask)) {
+			var selected = hit.collider.gameObject.GetComponent<Surface> ();
+			if (selected != null) {
+				SelectableBehavior.SelectSurface (selected);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private bool TouchIsOnUI(Vector2 touch) {
 		//Check if you hit a UI element (http://answers.unity3d.com/questions/821590/unity-46-how-to-raycast-against-ugui-objects-from.html)
 		var pointer = new PointerEventData(EventSystem.current);
 		pointer.position = touch;
 		var results = new List<RaycastResult> ();
 		EventSystem.current.RaycastAll(pointer, results); // Outputs to 'results'
-		if (results.Count == 0) {
-			//Check if you hit a surface
-			RaycastHit hit;
-			var ray = Camera.main.ScreenPointToRay (touch);
-			var layerMask = 1 << LayerMask.NameToLayer("Ignore Raycast"); //http://answers.unity3d.com/questions/8715/how-do-i-use-layermasks.html
-			if (Physics.Raycast (ray.origin, ray.direction, out hit, layerMask)) {
-				var selected = hit.collider.gameObject.GetComponent<Surface> ();
-				if (selected != null) {
-					SelectableBehavior.SelectSurface (selected);
-					return true;
-				}
-			}
-		}
-		return false;
+		return results.Count > 0;
 	}
 }
