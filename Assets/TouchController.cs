@@ -36,11 +36,11 @@ public class TouchController : MonoBehaviour {
 			Vector3 closestPoint = tangoPointCloud.m_points [closestPointIndex]; // Returns -1 if not found
 			if (closestPointIndex != -1) {
 				if (!_hasStartPoint) {
-					if (OcclusionController.IsOccluding ()) { StartLine (closestPoint); }
+					if (MainMenuController.GetEdgeDetectionMode() == "DRAG") { StartLine (closestPoint); }
 					_firstCorner = closestPoint;
 					_hasStartPoint = true;
 				}
-				if (OcclusionController.IsOccluding()) { ExtendLine (closestPoint); }
+				if (MainMenuController.GetEdgeDetectionMode() == "DRAG") { ExtendLine (closestPoint); }
 				_oppositeCorner = closestPoint;
 			}
 			if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled) {
