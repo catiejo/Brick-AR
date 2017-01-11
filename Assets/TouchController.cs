@@ -121,10 +121,10 @@ public class TouchController : MonoBehaviour {
 	/// </summary>
 	/// <param name="position">Touch position.</param>
 	private void HandleTouch(Vector2 position) {
-		ScreenLog.Clear ();
 		if (TouchIsOnUI (position)) {
 			return;
 		}
+		ScreenLog.Clear ();
 		// Check if user tapped
 		var diagonal = _firstCorner - _oppositeCorner;
 		if (diagonal.magnitude < 0.1f) {
