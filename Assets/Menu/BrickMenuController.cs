@@ -43,10 +43,14 @@ public class BrickMenuController : MonoBehaviour {
 	/// </summary>
 	/// <returns>The current material.</returns>
 	public Material GetCurrentMaterial () {
+		return GetMaterial (_currentMaterial);
+	}
+
+	private Material GetMaterial(int index) {
 		if (OcclusionController.IsOccluding ()) {
-			return brickMaterialsOccluded [_currentMaterial];
+			return brickMaterialsOccluded [index];
 		} else {
-			return brickMaterials [_currentMaterial];
+			return brickMaterials [index];
 		}
 	}
 
@@ -74,6 +78,20 @@ public class BrickMenuController : MonoBehaviour {
 				break;
 		}
 		CollapseMenu ();
+	}
+
+	public Material GetMaterialByColor(string color) {
+		switch (color) {
+		case "Beige":
+			return GetMaterial(0);
+		case "Green":
+			return GetMaterial(1);
+		case "Purple":
+			return GetMaterial(2);
+		case "Yellow":
+			return GetMaterial(3);
+		}
+		return GetCurrentMaterial (); // Should never get here, but just in case.
 	}
 }
 

@@ -10,7 +10,6 @@ public class OcclusionController : MonoBehaviour {
 	public BrickMenuController brickMenu;
 	private static bool _isOccluding;
 
-	//WHAT THE ACTUAL FUCK
 	void Start () {
 		ToggleOcclusion (true);
 	}
@@ -36,7 +35,7 @@ public class OcclusionController : MonoBehaviour {
 			tango.m_3drMinNumVertices = 20;
 		}
 		dynamicMesh.SetActive (currentState);
-//		SwitchMaterials ();
+		SwitchMaterials ();
 	}
 
 	public static bool IsOccluding() {
@@ -46,12 +45,10 @@ public class OcclusionController : MonoBehaviour {
 	//HACK Also in Surface
 	private void SwitchMaterials() {
 		var gameObjects = GameObject.FindGameObjectsWithTag ("Surface");
-		var count = 0;
 		foreach (var go in gameObjects) {
 			var surface = go.GetComponent<Surface> ();
-			brickMenu.SelectOption (surface.GetBrickColor ());
-			surface.SetMaterial (brickMenu.GetCurrentMaterial());
-			count++;
+			var material = brickMenu.GetMaterialByColor (surface.GetBrickColor ());
+			surface.SetMaterial (material);
 		}
 
 	}
