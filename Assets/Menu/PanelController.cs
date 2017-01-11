@@ -8,36 +8,40 @@ public class PanelController : MonoBehaviour {
 	private bool _isOpen = false;
 	private float _width;
 	private RectTransform rt;
+	private float _openPosition;
+	private float _closedPosition;
 
 	void Start() {
-		//FIXME: this won't get updated if open/closed position changes
 		rt = (RectTransform)this.transform;
 		_width = rt.rect.width;
-		ScreenLog.Write ("Width is: " + _width);
-
+		_openPosition = slideLeft ? -_width : 0.5f;
+		_closedPosition = slideLeft ? 0 : _width;
 	}
 
 	void Update () {
+		var pos = rt.anchoredPosition.x;
 		var slideAmount = _width / 7.0f; //TODO: incorporate speed
-		if (slideLeft) {
-			ScreenLog.Write ("slideLeft is true");
-//			if (_isOpen && this.transform.position.x < _width) {
-//				SlidePanel (slideAmount);
-//			} else if (!_isOpen && this.transform.position.x > 0) {
-//				SlidePanel (-slideAmount);
-//			}
-		} else {
-			ScreenLog.Write (rt.position.x.ToString ()); //WHY WHY WHY IS THIS NOT THE VALUE IN THE INSPECTOR
-			if (_isOpen && this.transform.position.x > 0.5f) { //0.5f for error
-				SlidePanel (-slideAmount);
-			} else if (!_isOpen && this.transform.position.x < _width) {
-				SlidePanel (slideAmount);
-			}
+		if (_isOpen && pos > _openPosition) { //0.5f for error
+			SlidePanel (-slideAmount);
+		} else if (!_isOpen && pos < _closedPosition) {
+			SlidePanel (slideAmount);
 		}
 	}
 
 	public void TogglePanel(bool toggle) {
 		_isOpen = toggle;
+	}
+
+	public void TogglePanel() {
+		_isOpen = !_isOpen;
+	}
+
+	public float GetPosition() {
+		return rt.anchoredPosition.x;
+	}
+
+	public float GetWidth() {
+		return _width;
 	}
 
 	/// <summary>
