@@ -3,7 +3,6 @@
 	Properties
 	{
 		_MainTex ("Texture", 2D) = "white" {}
-		_Density ("Density", Range(2,50)) = 30
 	}
     SubShader
     {
@@ -30,14 +29,12 @@
                 float2 uv : TEXCOORD0;
             };
 
-            float _Density;
-
             v2f vert(float4 pos : POSITION, float2 uv : TEXCOORD0)
             {
                 v2f o;
                 o.pos = mul(UNITY_MATRIX_MVP, pos);
                 o.projPos = ComputeScreenPos(o.pos);
- 				o.uv = uv * _Density;
+ 				o.uv = uv;
                 return o;
             }
  
@@ -53,17 +50,8 @@
                 	discard;
                 }
 
-                float2 c = i.uv;
-                c = floor(c) / 2;
-                float checker = frac(c.x + c.y) * 2;
-                return checker;
-                                       
-//            	half4 c;
-//                c.r = depth;
-//                c.g = 1 - depth;
-//                c.b = 1 - depth;
-//                c.a = 1;
-//                return c;
+                fixed4 col = tex2D(_MainTex, i.uv);
+                return col;
             }
  
             ENDCG
