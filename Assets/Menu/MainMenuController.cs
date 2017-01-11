@@ -4,8 +4,13 @@ using System.Collections;
 
 public class MainMenuController : MonoBehaviour {
 	public PanelController menuDrawer;
-	private bool _isOpen = false;
-	private static bool _dragEdgeDetectionMode = true;
+	public Text infoText;
+	private static bool _dragEdgeDetectionMode;
+
+	void Start () {
+		_dragEdgeDetectionMode = true;
+		infoText.enabled = !_dragEdgeDetectionMode;
+	}
 
 	void Update () {
 		var alpha = 1 + Mathf.Clamp(menuDrawer.GetPosition() / menuDrawer.GetWidth(), -1.0f, -0.4f);
@@ -21,6 +26,7 @@ public class MainMenuController : MonoBehaviour {
 	/// <param name="mode"><c>DRAG</c> is 0, <c>TAP</c> is 1 (or any non-zero value).</param>
 	public void ChangeEdgeDetectionMode(int mode) {
 		_dragEdgeDetectionMode = (mode == 0);
+		infoText.enabled = !_dragEdgeDetectionMode;
 		ScreenLog.Write("Mode changed to " + (_dragEdgeDetectionMode ? "DRAG " : "TAP ") + "mode.");
 	}
 
