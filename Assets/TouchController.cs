@@ -60,12 +60,12 @@ public class TouchController : MonoBehaviour {
 			surfaceMesh = SurfaceMesh.Create(mode, surface, FindVerticesOnPlane(plane));
 		}
 		if (surfaceMesh == null || surfaceMesh.IsEmpty ()) {
-			ScreenLog.Write("Unable to create the surface. Please try again.");
+			ScreenLog.Write("Please try again.");
 			surface.Undo ();
 			return false;
 		}
 		surface.SetMeshAndSelect (surfaceMesh.mesh);
-		ScreenLog.Write ("Mesh successfully built");
+		ScreenLog.Write ("Mesh successfully built!");
 		return true;
 	}
 

@@ -29,7 +29,6 @@ public abstract class SurfaceMesh : ScriptableObject {
 			surfaceMesh = ScriptableObject.CreateInstance<TapSurfaceMesh> ();
 		}
 		var success = surfaceMesh.Initialize (init);
-		ScreenLog.Write ("Finished initializing");
 		return success ? surfaceMesh : null;
 	}
 
@@ -41,7 +40,7 @@ public abstract class SurfaceMesh : ScriptableObject {
 		// Setup
 		_vertices = FindVertices ();
 		if (_vertices.Length < 3) {
-			ScreenLog.Write ("Insuficient vertices found. At least 3 required, found " + _vertices.Length);
+			ScreenLog.Write ("...insuficient vertices found. At least 3 required, found " + _vertices.Length);
 			return null; // Cannot create Mesh with less than 3 vertices.
 		}
 		ScreenLog.Write ("..." + _vertices.Length + " vertices found");
