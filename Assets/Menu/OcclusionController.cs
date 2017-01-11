@@ -8,6 +8,8 @@ public class OcclusionController : MonoBehaviour {
 	public GameObject dynamicMesh;
 	public TangoApplication tango;
 	public BrickMenuController brickMenu;
+	public Surface surface;
+	public Material[] defaultMaterials;
 	private static bool _isOccluding;
 
 	void Start () {
@@ -34,6 +36,7 @@ public class OcclusionController : MonoBehaviour {
 			tango.m_3drMinNumVertices = 20;
 		}
 		dynamicMesh.SetActive (currentState);
+		UpdateSurfacePrefabMaterial ();
 		SwitchMaterials ();
 	}
 
@@ -50,5 +53,13 @@ public class OcclusionController : MonoBehaviour {
 			surface.SetMaterial (material);
 		}
 
+	}
+
+	private void UpdateSurfacePrefabMaterial() {
+		if (_isOccluding) {
+			surface.SetMaterial (defaultMaterials[0]);
+		} else {
+			surface.SetMaterial (defaultMaterials[1]);
+		}
 	}
 }

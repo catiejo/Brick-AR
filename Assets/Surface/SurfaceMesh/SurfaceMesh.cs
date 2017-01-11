@@ -40,9 +40,9 @@ public abstract class SurfaceMesh : ScriptableObject {
 	public Mesh CreateMesh() {
 		// Setup
 		_vertices = FindVertices ();
-		ScreenLog.Write ("..." + _vertices.Length.ToString() + " vertices found");
+		ScreenLog.Write ("..." + _vertices.Length + " vertices found");
 		_triangles = FindTriangles ();
-		ScreenLog.Write ("..." + _triangles.Length.ToString() + " triangles found");
+		ScreenLog.Write ("..." + _triangles.Length/3 + " triangles found");
 		_uv = FindUV ();
 		ScreenLog.Write ("..." + _uv.Length + " uv coords found");
 		// Create
