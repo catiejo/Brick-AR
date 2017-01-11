@@ -76,22 +76,26 @@ public class BrickMenuController : MonoBehaviour {
 			case "Yellow":
 				_currentMaterial = 3;
 				break;
+			default:
+				_currentMaterial = 4; // Default material
+				break;
 		}
 		CollapseMenu ();
 	}
 
 	public Material GetMaterialByColor(string color) {
 		switch (color) {
-		case "Beige":
-			return GetMaterial(0);
-		case "Green":
-			return GetMaterial(1);
-		case "Purple":
-			return GetMaterial(2);
-		case "Yellow":
-			return GetMaterial(3);
+			case "Beige":
+				return GetMaterial(0);
+			case "Green":
+				return GetMaterial(1);
+			case "Purple":
+				return GetMaterial(2);
+			case "Yellow":
+				return GetMaterial(3);
+			default:
+				return GetMaterial(4);
 		}
-		return GetCurrentMaterial (); // Should never get here, but just in case.
 	}
 }
 

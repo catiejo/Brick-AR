@@ -8,6 +8,10 @@ public class Surface : MonoBehaviour {
 	private Plane _plane;
 	private Mesh _mesh;
 
+	void Start() {
+		_color = "Default";
+	}
+
 	/// <summary>
 	/// Gets the Surface's brick color.
 	/// </summary>
