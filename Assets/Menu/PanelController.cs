@@ -3,43 +3,45 @@ using UnityEngine.UI;
 using System.Collections;
 
 public class PanelController : MonoBehaviour {
-	public bool slideLeft;
-	[Range(0.01f, 1.0f)] public float speed;
-	private bool _isOpen = false;
+	public bool panelAnchoredLeft;
+	[Range(1, 10)] public int speed;
+
+	private float _rightPosition;
+	private float _leftPosition;
+	private bool _isMovingLeft;
+	private RectTransform _rt;
 	private float _width;
-	private RectTransform rt;
-	private float _openPosition;
-	private float _closedPosition;
 
 	void Start() {
-		rt = (RectTransform)this.transform;
-		_width = rt.rect.width;
-		_openPosition = slideLeft ? -_width : 0.5f;
-		_closedPosition = slideLeft ? 0 : _width;
+		_isMovingLeft = panelAnchoredLeft;
+		_rt = (RectTransform)this.transform;
+		_width = _rt.rect.width;
+		_leftPosition = panelAnchoredLeft ? -_width : 0;
+		_rightPosition = panelAnchoredLeft ? 0 : _width;
 	}
 
 	void Update () {
-		var pos = rt.anchoredPosition.x;
-		var slideAmount = _width / 7.0f; //TODO: incorporate speed
-		if (_isOpen && pos > _openPosition) { //0.5f for error
+		var pos = _rt.anchoredPosition.x;
+		var slideAmount = _width / (float)(11 - speed);
+		if (_isMovingLeft && pos > _leftPosition) {
 			SlidePanel (-slideAmount);
-		} else if (!_isOpen && pos < _closedPosition) {
+		} else if (!_isMovingLeft && pos < _rightPosition) {
 			SlidePanel (slideAmount);
 		}
 	}
 
-	public void TogglePanel(bool toggle) {
-		_isOpen = toggle;
-	}
-
-	public void TogglePanel() {
-		_isOpen = !_isOpen;
-	}
-
+	/// <summary>
+	/// Gets the anchored position of the Panel's rect transform.
+	/// </summary>
+	/// <returns>The anchored position.</returns>
 	public float GetPosition() {
-		return rt.anchoredPosition.x;
+		return _rt.anchoredPosition.x;
 	}
 
+	/// <summary>
+	/// Gets the width of the Panel.
+	/// </summary>
+	/// <returns>The width.</returns>
 	public float GetWidth() {
 		return _width;
 	}
@@ -50,5 +52,12 @@ public class PanelController : MonoBehaviour {
 	/// <param name="amount">Amount in pixels.</param>
 	private void SlidePanel(float amount) {
 		this.transform.position += new Vector3(amount, 0, 0);
+	}
+
+	/// <summary>
+	/// Changes the direction the panel is moving.
+	/// </summary>
+	public void TogglePanel() {
+		_isMovingLeft = !_isMovingLeft;
 	}
 }
