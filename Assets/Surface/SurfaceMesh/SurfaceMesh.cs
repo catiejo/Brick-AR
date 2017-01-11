@@ -40,6 +40,10 @@ public abstract class SurfaceMesh : ScriptableObject {
 	public Mesh CreateMesh() {
 		// Setup
 		_vertices = FindVertices ();
+		if (_vertices.Length < 3) {
+			ScreenLog.Write ("Insuficient vertices found. At least 3 required, found " + _vertices.Length);
+			return null; // Cannot create Mesh with less than 3 vertices.
+		}
 		ScreenLog.Write ("..." + _vertices.Length + " vertices found");
 		_triangles = FindTriangles ();
 		ScreenLog.Write ("..." + _triangles.Length/3 + " triangles found");
