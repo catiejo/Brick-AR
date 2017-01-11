@@ -1,49 +1,50 @@
 ﻿Shader "CatieJo/Dynamic Mesh Shader" 
-//Copied from: https://github.com/stetro/project-tango-poc/blob/master/unity/UnityConstructor/Assets/Shader/MatteShadow.shader
-{
-	Properties 
-	{
-	  	_Color ("Main Color", Color) = (1,1,1,1)
-	  	_MainTex ("Base (RGB) Trans (A)", 2D) = "white" {}
-	  	_Cutoff ("Alpha cutoff", Range(0,1)) = 0.5
- 	}
- 
+{ 
 	 SubShader 
 	 {
-	 
-		  Tags {"Queue" = "Geometry-10" "IgnoreProjector"="True" "RenderType"="TransparentCutout"}
-		  LOD 200
-		  Blend Zero SrcColor
-		  Lighting Off
-		  ZTest LEqual
-		  ZWrite On
-		  ColorMask 0
-		  Pass {}
-		 
-		 CGPROGRAM
-		 #pragma surface surf ShadowOnly alphatest:_Cutoff
+        Pass
+        {
+ 			ZWrite On
 
-		 fixed4 _Color;
-		 
-		 struct Input {
-		 	float2 uv_MainTex;
-		 };
-		 
-		 inline fixed4 LightingShadowOnly (SurfaceOutput s, fixed3 lightDir, fixed atten)
-		 {
-			 fixed4 c;
-			 c.rgb = s.Albedo*atten;
-			 c.a = s.Alpha;
-			 return c;
-		 }
-		 
-		 void surf (Input IN, inout SurfaceOutput o) 
-		 {
-			 fixed4 c = _Color;
-			 o.Albedo = c.rgb;
-			 o.Alpha = 1;
-		 }
-		 ENDCG
+            CGPROGRAM
+            #pragma target 3.0
+            #pragma vertex vert
+            #pragma fragment frag
+            #include "UnityCG.cginc"
+ 
+            uniform sampler2D _CameraDepthTexture; //the depth texture
+ 
+            struct v2f
+            {
+                float4 pos : SV_POSITION;
+                float4 projPos : TEXCOORD1; //Screen position of pos
+            };
+
+            v2f vert(float4 pos : POSITION)
+            {
+                v2f o;
+                o.pos = mul(UNITY_MATRIX_MVP, pos);
+                o.projPos = ComputeScreenPos(o.pos);
+                return o;
+            }
+ 
+            half4 frag(v2f i) : COLOR
+            {
+                //Grab the depth value from the depth texture
+                //Linear01Depth restricts this value to [0, 1]
+                float depth = Linear01Depth (tex2Dproj(_CameraDepthTexture,
+                                                             UNITY_PROJ_COORD(i.projPos)).r);
+            	half4 c;
+                c.r = depth;
+                c.g = depth;
+                c.b = depth;
+                c.a = 1;
+ 
+                return c;
+            }
+
+            ENDCG
+        }		 
 	 }
 	 Fallback "Transparent/Cutout/VertexLit"
  }
