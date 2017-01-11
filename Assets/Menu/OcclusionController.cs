@@ -19,7 +19,6 @@ public class OcclusionController : MonoBehaviour {
 	/// </summary>
 	/// <param name="currentState">Turn on if <c>true</c>, off if <c>false</c>.</param>
 	public void ToggleOcclusion(bool currentState) {
-		ScreenLog.Write ("occlusion toggled");
 		_isOccluding = currentState;
 		depthPanelToggle.isOn = false;
 		depthPanelToggle.interactable = currentState;

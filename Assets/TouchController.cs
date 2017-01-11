@@ -6,7 +6,6 @@ using Tango;
 using System.Linq;
 
 public class TouchController : MonoBehaviour {
-	public MeshFilter sphere;
 	public GameObject line;
 	public Surface surfaceTemplate;
 	public TangoPointCloud tangoPointCloud;
@@ -14,25 +13,6 @@ public class TouchController : MonoBehaviour {
 	private Vector3 _firstCorner;
 	private bool _hasStartPoint = false;
 	private Vector3 _oppositeCorner;
-
-//	void Start() {
-//		//Setup manually since we don't have pointcloud
-//		var center = new Vector3(1, 1, 1);
-//		var plane = new Plane (Quaternion.Euler(30, 60, 70) * -Vector3.forward, center);
-//		Surface surface = Instantiate (surfaceTemplate) as Surface;
-//		surface.SetTransform (plane, center);
-//		SurfaceMesh surfaceMesh;
-//		//Vertices
-//		_firstCorner = center + new Vector3 (1, 1, 1);
-//		_oppositeCorner = center + new Vector3 (-1, -1, -1);
-//
-//		ScreenLog.Write ("Created manual DRAG Surface. Disable before launching to production.");
-//		surfaceMesh = SurfaceMesh.Create("DRAG", surface, _firstCorner, _oppositeCorner);
-//		surface.SetMeshAndSelect (surfaceMesh.mesh);
-//		ScreenLog.Write ("Created manual TAP Surface. Disable before launching to production.");
-//		surfaceMesh = SurfaceMesh.Create("TAP", surface, sphere.mesh.vertices.ToList());
-//		surface.SetMeshAndSelect (surfaceMesh.mesh);
-//	}
 
 	void Update () {
 		if (Input.touchCount > 0)
