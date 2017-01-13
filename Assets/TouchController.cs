@@ -65,9 +65,9 @@ public class TouchController : MonoBehaviour {
 		SurfaceMesh surfaceMesh;
 		var mode = MainMenuController.GetEdgeDetectionMode ();
 		if (mode == "DRAG") {
-			surfaceMesh = SurfaceMesh.Create(mode, surface, _firstCorner, _oppositeCorner);
+			surfaceMesh = new DragSurfaceMesh(surface, _firstCorner, _oppositeCorner);
 		} else {
-			surfaceMesh = SurfaceMesh.Create(mode, surface, FindVerticesOnPlane(plane));
+			surfaceMesh = new TapSurfaceMesh(surface, FindVerticesOnPlane(plane));
 		}
 		if (surfaceMesh == null) {
 			//Do I need to destroy the surfaceMesh object, too?

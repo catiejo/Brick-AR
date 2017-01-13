@@ -34,10 +34,9 @@ public class TapSurfaceMesh : SurfaceMesh {
 	}
 
 	public TapSurfaceMesh(Surface surface, List<Vector3> worldVertices) {
-		_worldVertices = worldVertices;
 		_associatedSurface = surface;
-		Mesh tapSurfaceMesh = CreateMesh ();
-		mesh = tapSurfaceMesh;
+		_worldVertices = worldVertices;
+		mesh = CreateMesh ();
 	}
 
 	protected override int[] FindTriangles ()
@@ -98,22 +97,6 @@ public class TapSurfaceMesh : SurfaceMesh {
 		}
 
 		return vertices.ToArray();
-	}
-
-	/// <summary>
-	/// Initialize the DragSurface. Parameters must be in order: surface, worldVertices.
-	/// </summary>
-	protected override bool Initialize(params object[] init) {
-		if (init.Length != 2) {
-			Debug.LogError ("Incorrect number of arguments called. Must be in order: (Surface) surface, (List<Vector3>) worldVertices");
-			return false;
-		}
-		ScreenLog.Write ("Initalizing");
-		_associatedSurface = (Surface) init [0];
-		_worldVertices = (List<Vector3>) init [1];
-		Mesh tapSurfaceMesh = CreateMesh ();
-		mesh = tapSurfaceMesh;
-		return true;
 	}
 
 	/// <summary>
