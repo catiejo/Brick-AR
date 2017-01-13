@@ -41,7 +41,7 @@ public abstract class SurfaceMesh : ScriptableObject {
 		_vertices = FindVertices ();
 		if (_vertices.Length < 3) {
 			ScreenLog.Write ("...insuficient vertices found. At least 3 required, found " + _vertices.Length);
-			return null; // Cannot create Mesh with less than 3 vertices.
+			return null;
 		}
 		ScreenLog.Write ("..." + _vertices.Length + " vertices found");
 		_triangles = FindTriangles ();
@@ -56,14 +56,6 @@ public abstract class SurfaceMesh : ScriptableObject {
 		mesh.uv = _uv;
 		mesh.triangles = _triangles;
 		return mesh;
-	}
-
-	/// <summary>
-	/// Determines if the mesh is empty by whether or not it has vertices.
-	/// </summary>
-	/// <returns><c>true</c> if this instance has vertices; otherwise, <c>false</c>.</returns>
-	public bool IsEmpty() {
-		return _vertices.Length == 0;
 	}
 
 	/// <summary>

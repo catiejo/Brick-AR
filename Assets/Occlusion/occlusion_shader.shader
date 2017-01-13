@@ -19,13 +19,13 @@
             #pragma fragment frag
             #include "UnityCG.cginc"
  
-            uniform sampler2D _CameraDepthTexture; //the depth texture
+            uniform sampler2D _CameraDepthTexture;
             sampler2D _MainTex;
  
             struct v2f
             {
                 float4 pos : SV_POSITION;
-                float4 projPos : TEXCOORD1; //Screen position of pos
+                float4 screenPos : TEXCOORD1;
                 float2 uv : TEXCOORD0;
             };
 
@@ -33,7 +33,7 @@
             {
                 v2f o;
                 o.pos = mul(UNITY_MATRIX_MVP, pos);
-                o.projPos = ComputeScreenPos(o.pos);
+                o.screenPos = ComputeScreenPos(o.pos);
  				o.uv = uv;
                 return o;
             }
@@ -42,11 +42,11 @@
             {
                 //Grab the depth value from the depth texture
                 //Linear01Depth restricts this value to [0, 1]
-                float depth = Linear01Depth (tex2Dproj(_CameraDepthTexture,
-                                                             UNITY_PROJ_COORD(i.projPos)).r);
+                float cameraDepth = Linear01Depth (tex2Dproj(_CameraDepthTexture,
+                                                             UNITY_PROJ_COORD(i.screenPos)).r);
 
-                float localDepth = Linear01Depth(i.pos.z);
-                if (abs(localDepth - depth) > 0.02) {
+                float goDepth = Linear01Depth(i.pos.z);
+                if (abs(goDepth - cameraDepth) > 0.02) {
                 	discard;
                 }
 
