@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 public class TapSurfaceMesh : SurfaceMesh {
 	private List<Vector3> _worldVertices;
+
 	//Helper class for kdTree
 	public class Point
 	{
@@ -17,6 +18,7 @@ public class TapSurfaceMesh : SurfaceMesh {
 			vectorPosition = point;
 		}
 	}
+
 	//Helper class for MIConvexHull
 	public class MIVertex : IVertex
 	{
@@ -82,7 +84,7 @@ public class TapSurfaceMesh : SurfaceMesh {
 		while (pointsToCheck.Count != 0) {
 			var currentPoint = pointsToCheck.Dequeue ();
 			var neighbors = kdTree.NearestNeighbors(currentPoint.doublePosition, neighborCountThreshold, neighborDistanceThreshold);
-			int neighborCount = 0;
+			var neighborCount = 0;
 			while (neighbors.MoveNext()) {
 				var point = neighbors.Current;
 				if (!point.visited) {

@@ -8,12 +8,12 @@ public class ScreenLog : MonoBehaviour {
 	void Awake() {
 		_instance = this.GetComponent<Text>(); //set our static reference to our newly initialized instance
 		if (!_instance) {
-			Write("!!! ScreenLog must be attached to a gameobject containing a UI Text component. !!!");
+			Debug.LogError("!!! ScreenLog must be attached to a gameobject containing a UI Text component. !!!");
 		}
 	}
 
 	public static void Write(string message) {
-		_instance.text += "\n" + message;
+		_instance.text += message + "\n";
 	}
 
 	public static void Clear() {

@@ -10,15 +10,20 @@ public class TouchController : MonoBehaviour {
 	public TangoPointCloud tangoPointCloud;
 
 	private Vector3 _firstCorner;
-	private bool _hasStartPoint = false;
+	private bool _hasStartPoint;
 	private Vector3 _oppositeCorner;
-	private int _stationaryCount = 0;
+	private int _stationaryCount;
+
+	void Start () {
+		_hasStartPoint = false;
+		_stationaryCount = 0;
+	}
 
 	void Update () {
 		if (Input.touchCount > 0)
 		{	
-			Touch touch = Input.GetTouch (0);
-			int indexOfClosestPoint = tangoPointCloud.FindClosestPoint (Camera.main, touch.position, 500); // Returns -1 if not found
+			var touch = Input.GetTouch (0);
+			var indexOfClosestPoint = tangoPointCloud.FindClosestPoint (Camera.main, touch.position, 500); // Returns -1 if not found
 
 			if (indexOfClosestPoint != -1) {
 				var closestPoint = tangoPointCloud.m_points [indexOfClosestPoint];
@@ -60,7 +65,7 @@ public class TouchController : MonoBehaviour {
 			ScreenLog.Write("Please try again.");
 			return false;
 		}
-		Surface surface = Instantiate (surfaceTemplate) as Surface;
+		var surface = Instantiate (surfaceTemplate) as Surface;
 		surface.SetTransform (plane, planeCenter);
 		SurfaceMesh surfaceMesh;
 		var mode = MainMenuController.GetEdgeDetectionMode ();
@@ -84,7 +89,7 @@ public class TouchController : MonoBehaviour {
 	/// </summary>
 	/// <param name="end">New end point.</param>
 	private void ExtendLine(Vector3 end) {
-		LineRenderer lr = line.GetComponent<LineRenderer>();
+		var lr = line.GetComponent<LineRenderer>();
 		lr.SetPosition(1, end);
 	}
 
@@ -132,7 +137,7 @@ public class TouchController : MonoBehaviour {
 	private void StartLine(Vector3 start)
 	{
 		line.transform.position = start;
-		LineRenderer lr = line.GetComponent<LineRenderer>();
+		var lr = line.GetComponent<LineRenderer>();
 		lr.SetPosition(0, start);
 		lr.SetPosition(1, start);
 		line.SetActive(true);
