@@ -4,7 +4,7 @@
 	 {
 		Tags { "Queue"="Transparent" "RenderType"="Transparent" }
 		CGPROGRAM
-		#pragma surface surf Lambert alpha vertex:vert
+		#pragma surface surf Lambert alpha vertex:vert addshadow
 		struct Input {
 			float3 customColor;
 		};
