@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using Tango;
 
 public class OcclusionController : MonoBehaviour {
 	public GameObject dynamicMesh;
+	public Slider alphaSlider;
 	public TangoApplication tango;
 	public BrickMenuController brickMenu;
 	public Surface surface;
@@ -40,6 +42,7 @@ public class OcclusionController : MonoBehaviour {
 			tango.m_3drMinNumVertices = 20;
 		}
 		dynamicMesh.SetActive (currentState);
+		alphaSlider.interactable = currentState;
 		surface.SetMaterial (brickMenu.GetMaterialByColor("Default"));
 		SwitchMaterials ();
 	}

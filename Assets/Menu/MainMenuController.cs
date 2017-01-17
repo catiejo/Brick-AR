@@ -3,7 +3,8 @@ using UnityEngine.UI;
 using System.Collections;
 
 public class MainMenuController : MonoBehaviour {
-	public Text infoText;
+	public Text tapModeText;
+	public Text alphaAmountText;
 	public Image menuDrawer;
 	[Range(1, 10)] public int speed;
 
@@ -14,7 +15,7 @@ public class MainMenuController : MonoBehaviour {
 
 	void Start () {
 		_dragEdgeDetectionMode = true;
-		infoText.enabled = !_dragEdgeDetectionMode;
+		tapModeText.enabled = !_dragEdgeDetectionMode;
 		_drawerIsOpen = false;
 		_rt = (RectTransform)menuDrawer.transform;
 		_width = _rt.rect.width;
@@ -42,7 +43,7 @@ public class MainMenuController : MonoBehaviour {
 	/// <param name="mode"><c>DRAG</c> is 0, <c>TAP</c> is 1 (or any non-zero value).</param>
 	public void ChangeEdgeDetectionMode(int mode) {
 		_dragEdgeDetectionMode = (mode == 0);
-		infoText.enabled = !_dragEdgeDetectionMode;
+		tapModeText.enabled = !_dragEdgeDetectionMode;
 		ScreenLog.Write("Mode changed to " + (_dragEdgeDetectionMode ? "DRAG " : "TAP ") + "mode.");
 	}
 
@@ -52,6 +53,15 @@ public class MainMenuController : MonoBehaviour {
 	/// <returns><c>DRAG</c> or <c>TAP<c>.</returns>
 	public static string GetEdgeDetectionMode() {
 		return _dragEdgeDetectionMode ? "DRAG" : "TAP";
+	}
+
+	/// <summary>
+	/// Sets the transparency of the dynamic mesh.
+	/// </summary>
+	/// <param name="alpha">Alpha (0.0 to 1.0)</param>
+	public void SetMeshTransparency(float alpha) {
+		alphaAmountText.text = alpha.ToString("0.00"); //http://stackoverflow.com/a/6356381/5143682
+		DynamicMeshController.SetShaderAlpha (alpha);
 	}
 
 	/// <summary>
