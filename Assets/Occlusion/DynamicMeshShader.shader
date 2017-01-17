@@ -5,7 +5,7 @@
 	}
 	SubShader 
 	{
-		Tags { "Queue"="Geometry" }
+		Tags { "Queue"="Geometry" } //Transparent queue doesn't get written to depth buffer, even with ZWrite On
 		CGPROGRAM
 		#pragma surface surf Lambert alpha vertex:vert addshadow
 		float _Alpha;
