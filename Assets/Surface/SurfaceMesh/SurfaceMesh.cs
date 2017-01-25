@@ -57,7 +57,7 @@ public abstract class SurfaceMesh {
 	protected Vector2[] FindUV() {
 		var uv = new List<Vector2> ();
 		foreach (var vertex in _vertices) {
-			uv.Add (vertex * 0.3f); //Add method knows to discard z coordinate
+			uv.Add (vertex); //Add method knows to discard z coordinate
 		} 
 		return uv.ToArray();
 	}
