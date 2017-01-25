@@ -3,34 +3,38 @@ using UnityEngine.UI;
 using System.Collections;
 
 public class MainMenuController : MonoBehaviour {
+	public Text tapModeText;
+	public Text alphaAmountText;
 	public Image menuDrawer;
-	private Color _color = new Color(0, 0, 0, 0);
-	private bool _isOpen = false;
-	private static bool _dragEdgeDetectionMode = true;
+	[Range(1, 10)] public int speed;
 
-	void Update () {
-		if (_isOpen && menuDrawer.transform.position.x < 0.0f) {
-			SlideMenu (100f);
-		} else if (!_isOpen && menuDrawer.transform.position.x > -500.0f) {
-			SlideMenu (-100f);
-		}
-		var alpha = 1 + Mathf.Clamp(menuDrawer.transform.position.x / 500.0f, -1.0f, -0.4f);
-		// Enabling and disabling background so it doesn't affect UI raycast
-		var background = GetComponent<Image> ();
-		if (alpha == 0) {
-			background.enabled = false;
-		} else {
-			background.enabled = true;
-			_color = new Color (0, 0, 0, alpha);
-			background.color = _color;
-		}
+	private static bool _dragEdgeDetectionMode;
+	private bool _drawerIsOpen;
+	private RectTransform _rt;
+	private float _width;
+
+	void Start () {
+		_dragEdgeDetectionMode = true;
+		tapModeText.enabled = !_dragEdgeDetectionMode;
+		_drawerIsOpen = false;
+		_rt = (RectTransform)menuDrawer.transform;
+		_width = _rt.rect.width;
 	}
 
-	/// <summary>
-	/// Toggles the boolean that opens/closes the drawer menu.
-	/// </summary>
-	public void ToggleMenu() {
-		_isOpen = !_isOpen;
+	void Update () {
+		var pos = _rt.anchoredPosition.x;
+		var slideAmount = _width / (float)(11 - speed);
+
+		if (_drawerIsOpen && pos < -0.5) { //
+			menuDrawer.transform.position += new Vector3(slideAmount, 0, 0);
+		} else if (!_drawerIsOpen && pos > -_width) {
+			menuDrawer.transform.position += new Vector3(-slideAmount, 0, 0);
+		}
+		var alpha = 1 + Mathf.Clamp(pos / _width, -1.0f, -0.4f);
+		// Enabling and disabling background so it doesn't affect UI raycast
+		var background = GetComponent<Image> ();
+		background.enabled = (alpha != 0);
+		background.color = new Color (0, 0, 0, alpha);
 	}
 
 	/// <summary>
@@ -39,6 +43,7 @@ public class MainMenuController : MonoBehaviour {
 	/// <param name="mode"><c>DRAG</c> is 0, <c>TAP</c> is 1 (or any non-zero value).</param>
 	public void ChangeEdgeDetectionMode(int mode) {
 		_dragEdgeDetectionMode = (mode == 0);
+		tapModeText.enabled = !_dragEdgeDetectionMode;
 		ScreenLog.Write("Mode changed to " + (_dragEdgeDetectionMode ? "DRAG " : "TAP ") + "mode.");
 	}
 
@@ -51,10 +56,19 @@ public class MainMenuController : MonoBehaviour {
 	}
 
 	/// <summary>
-	/// Slides the menu right or left (if negative).
+	/// Sets the transparency of the dynamic mesh.
 	/// </summary>
-	/// <param name="amount">Amount in pixels.</param>
-	private void SlideMenu(float amount) {
-		menuDrawer.transform.position += new Vector3(amount, 0, 0);
+	/// <param name="alpha">Alpha (0.0 to 1.0)</param>
+	public void SetMeshTransparency(float alpha) {
+		alphaAmountText.text = alpha.ToString("0.00"); //http://stackoverflow.com/a/6356381/5143682
+		DynamicMeshController.SetShaderAlpha (alpha);
 	}
+
+	/// <summary>
+	/// Changes the direction the panel is moving.
+	/// </summary>
+	public void ToggleDrawerl() {
+		_drawerIsOpen = !_drawerIsOpen;
+	}
+
 }

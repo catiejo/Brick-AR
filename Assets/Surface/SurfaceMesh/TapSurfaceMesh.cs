@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 public class TapSurfaceMesh : SurfaceMesh {
 	private List<Vector3> _worldVertices;
+
 	//Helper class for kdTree
 	public class Point
 	{
@@ -17,6 +18,7 @@ public class TapSurfaceMesh : SurfaceMesh {
 			vectorPosition = point;
 		}
 	}
+
 	//Helper class for MIConvexHull
 	public class MIVertex : IVertex
 	{
@@ -34,10 +36,9 @@ public class TapSurfaceMesh : SurfaceMesh {
 	}
 
 	public TapSurfaceMesh(Surface surface, List<Vector3> worldVertices) {
-		_worldVertices = worldVertices;
 		_associatedSurface = surface;
-		Mesh tapSurfaceMesh = CreateMesh ();
-		mesh = tapSurfaceMesh;
+		_worldVertices = worldVertices;
+		mesh = CreateMesh ();
 	}
 
 	protected override int[] FindTriangles ()
@@ -83,7 +84,7 @@ public class TapSurfaceMesh : SurfaceMesh {
 		while (pointsToCheck.Count != 0) {
 			var currentPoint = pointsToCheck.Dequeue ();
 			var neighbors = kdTree.NearestNeighbors(currentPoint.doublePosition, neighborCountThreshold, neighborDistanceThreshold);
-			int neighborCount = 0;
+			var neighborCount = 0;
 			while (neighbors.MoveNext()) {
 				var point = neighbors.Current;
 				if (!point.visited) {
@@ -98,22 +99,6 @@ public class TapSurfaceMesh : SurfaceMesh {
 		}
 
 		return vertices.ToArray();
-	}
-
-	/// <summary>
-	/// Initialize the DragSurface. Parameters must be in order: surface, worldVertices.
-	/// </summary>
-	protected override bool Initialize(params object[] init) {
-		if (init.Length != 2) {
-			Debug.LogError ("Incorrect number of arguments called. Must be in order: (Surface) surface, (List<Vector3>) worldVertices");
-			return false;
-		}
-		ScreenLog.Write ("Initalizing");
-		_associatedSurface = (Surface) init [0];
-		_worldVertices = (List<Vector3>) init [1];
-		Mesh tapSurfaceMesh = CreateMesh ();
-		mesh = tapSurfaceMesh;
-		return true;
 	}
 
 	/// <summary>

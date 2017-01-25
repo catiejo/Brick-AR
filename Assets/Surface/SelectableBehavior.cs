@@ -5,10 +5,11 @@ public class SelectableBehavior : MonoBehaviour {
 	public static Color glowColor = Color.white;
 
 	private static SelectableBehavior _instance;
-	private static float _maxGlowAmount = 0.25f;
+	private static float _maxGlowAmount;
 	private static Surface _selectedSurface;
 
 	void Awake() {
+		_maxGlowAmount = 0.25f;
 		_instance = this; //set our static reference to our newly initialized instance
 	}
 
@@ -16,7 +17,7 @@ public class SelectableBehavior : MonoBehaviour {
 	/// Deselects the current selectedSurface.
 	/// </summary>
 	public static void DeselectSurface() {
-		Material material = _selectedSurface.GetComponent<Renderer>().material;
+		var material = _selectedSurface.GetComponent<Renderer>().material;
 		material.DisableKeyword("_EMISSION");
 		material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.EmissiveIsBlack;
 		material.SetColor("_EmissionColor", Color.black);
@@ -57,7 +58,7 @@ public class SelectableBehavior : MonoBehaviour {
 	private static IEnumerator GlowRoutine()
 	{
 		// Setup
-		Material material = _selectedSurface.GetComponent<Renderer>().material;
+		var material = _selectedSurface.GetComponent<Renderer>().material;
 		material.EnableKeyword("_EMISSION");
 		material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.RealtimeEmissive;
 		// Increase intensity (fade in)

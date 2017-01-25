@@ -3,7 +3,6 @@ using UnityEngine.EventSystems;
 using System.Collections;
 using System.Collections.Generic;
 using Tango;
-using System.Linq;
 
 public class TouchController : MonoBehaviour {
 	public GameObject line;
@@ -11,25 +10,41 @@ public class TouchController : MonoBehaviour {
 	public TangoPointCloud tangoPointCloud;
 
 	private Vector3 _firstCorner;
-	private bool _hasStartPoint = false;
+	private bool _hasStartPoint;
 	private Vector3 _oppositeCorner;
+	private int _stationaryCount;
+
+	void Start () {
+		_hasStartPoint = false;
+		_stationaryCount = 0;
+	}
 
 	void Update () {
 		if (Input.touchCount > 0)
 		{	
-			Touch touch = Input.GetTouch (0);
-			int closestPointIndex = tangoPointCloud.FindClosestPoint (Camera.main, touch.position, 500);
-			Vector3 closestPoint = tangoPointCloud.m_points [closestPointIndex]; // Returns -1 if not found
-			if (closestPointIndex != -1) {
+			var touch = Input.GetTouch (0);
+			var indexOfClosestPoint = tangoPointCloud.FindClosestPoint (Camera.main, touch.position, 500); // Returns -1 if not found
+
+			if (indexOfClosestPoint != -1) {
+				var closestPoint = tangoPointCloud.m_points [indexOfClosestPoint];
+				var showDragLine = MainMenuController.GetEdgeDetectionMode () == "DRAG";
 				if (!_hasStartPoint) {
-					if (MainMenuController.GetEdgeDetectionMode() == "DRAG") { StartLine (closestPoint); }
-					_firstCorner = closestPoint;
 					_hasStartPoint = true;
+					_firstCorner = closestPoint;
+					if (showDragLine) { 
+						StartLine (closestPoint); 
+					}
 				}
-				if (MainMenuController.GetEdgeDetectionMode() == "DRAG") { ExtendLine (closestPoint); }
 				_oppositeCorner = closestPoint;
+				if (showDragLine) { 
+					ExtendLine (closestPoint); 
+				}
 			}
-			if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled) {
+			if (touch.phase == TouchPhase.Stationary) {
+				_stationaryCount++;
+			}
+			if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled || _stationaryCount > 100) {
+				_stationaryCount = 0;
 				line.SetActive(false);
 				if (_hasStartPoint) {
 					_hasStartPoint = false;
@@ -44,28 +59,28 @@ public class TouchController : MonoBehaviour {
 	/// </summary>
 	/// <returns><c>true</c>, if Surface was successfully created, <c>false</c> otherwise.</returns>
 	private bool CreateSurface() {
-		Vector3 center;
+		Vector3 planeCenter;
 		Plane plane;
-		if (!tangoPointCloud.FindPlane (Camera.main, Camera.main.WorldToScreenPoint(Vector3.Lerp (_firstCorner, _oppositeCorner, 0.5f)), out center, out plane)) {
-			ScreenLog.Write("No surface found. Please try again.");
+		if (!tangoPointCloud.FindPlane (Camera.main, Camera.main.WorldToScreenPoint(Vector3.Lerp (_firstCorner, _oppositeCorner, 0.5f)), out planeCenter, out plane)) {
+			ScreenLog.Write("Please try again.");
 			return false;
 		}
-		Surface surface = Instantiate (surfaceTemplate) as Surface;
-		surface.SetTransform (plane, center);
-		var mode = MainMenuController.GetEdgeDetectionMode ();
+		var surface = Instantiate (surfaceTemplate) as Surface;
+		surface.SetTransform (plane, planeCenter);
 		SurfaceMesh surfaceMesh;
+		var mode = MainMenuController.GetEdgeDetectionMode ();
 		if (mode == "DRAG") {
-			surfaceMesh = SurfaceMesh.Create(mode, surface, _firstCorner, _oppositeCorner);
+			surfaceMesh = new DragSurfaceMesh(surface, _firstCorner, _oppositeCorner);
 		} else {
-			surfaceMesh = SurfaceMesh.Create(mode, surface, FindVerticesOnPlane(plane));
+			surfaceMesh = new TapSurfaceMesh(surface, FindVerticesOnPlane(plane));
 		}
-		if (surfaceMesh == null || surfaceMesh.IsEmpty ()) {
-			ScreenLog.Write("Unable to create the surface. Please try again.");
+		if (surfaceMesh == null) {
+			//Do I need to destroy the surfaceMesh object, too?
+			ScreenLog.Write("Please try again.");
 			surface.Undo ();
 			return false;
 		}
 		surface.SetMeshAndSelect (surfaceMesh.mesh);
-		ScreenLog.Write ("Mesh successfully built");
 		return true;
 	}
 
@@ -74,7 +89,7 @@ public class TouchController : MonoBehaviour {
 	/// </summary>
 	/// <param name="end">New end point.</param>
 	private void ExtendLine(Vector3 end) {
-		LineRenderer lr = line.GetComponent<LineRenderer>();
+		var lr = line.GetComponent<LineRenderer>();
 		lr.SetPosition(1, end);
 	}
 
@@ -122,10 +137,19 @@ public class TouchController : MonoBehaviour {
 	private void StartLine(Vector3 start)
 	{
 		line.transform.position = start;
-		LineRenderer lr = line.GetComponent<LineRenderer>();
+		var lr = line.GetComponent<LineRenderer>();
 		lr.SetPosition(0, start);
 		lr.SetPosition(1, start);
 		line.SetActive(true);
+	}
+
+	private bool TouchIsOnUI(Vector2 touch) {
+		//Check if you hit a UI element (http://answers.unity3d.com/questions/821590/unity-46-how-to-raycast-against-ugui-objects-from.html)
+		var pointer = new PointerEventData(EventSystem.current);
+		pointer.position = touch;
+		var results = new List<RaycastResult> ();
+		EventSystem.current.RaycastAll(pointer, results); // Outputs to 'results'
+		return results.Count > 0;
 	}
 
 	/// <summary>
@@ -146,14 +170,5 @@ public class TouchController : MonoBehaviour {
 			}
 		}
 		return false;
-	}
-
-	private bool TouchIsOnUI(Vector2 touch) {
-		//Check if you hit a UI element (http://answers.unity3d.com/questions/821590/unity-46-how-to-raycast-against-ugui-objects-from.html)
-		var pointer = new PointerEventData(EventSystem.current);
-		pointer.position = touch;
-		var results = new List<RaycastResult> ();
-		EventSystem.current.RaycastAll(pointer, results); // Outputs to 'results'
-		return results.Count > 0;
 	}
 }

@@ -4,16 +4,24 @@ using System.Collections;
 using Tango;
 
 public class OcclusionController : MonoBehaviour {
-	public Toggle depthPanelToggle;
+	public SliderBehavior alphaSlider;
 	public GameObject dynamicMesh;
 	public TangoApplication tango;
 	public BrickMenuController brickMenu;
 	public Surface surface;
-	public Material[] defaultMaterials;
+
 	private static bool _isOccluding;
 
 	void Start () {
 		ToggleOcclusion (true);
+	}
+
+	/// <summary>
+	/// Allows other classes to check if app is currently in occlusion mode.
+	/// </summary>
+	/// <returns><c>true</c> if is occluding; otherwise, <c>false</c>.</returns>
+	public static bool IsOccluding() {
+		return _isOccluding;
 	}
 
 	/// <summary>
@@ -22,8 +30,6 @@ public class OcclusionController : MonoBehaviour {
 	/// <param name="currentState">Turn on if <c>true</c>, off if <c>false</c>.</param>
 	public void ToggleOcclusion(bool currentState) {
 		_isOccluding = currentState;
-		depthPanelToggle.isOn = false;
-		depthPanelToggle.interactable = currentState;
 		tango.m_enable3DReconstruction = currentState;
 		if (currentState) {
 			tango.m_3drUpdateMethod = Tango3DReconstruction.UpdateMethod.PROJECTIVE;
@@ -35,16 +41,15 @@ public class OcclusionController : MonoBehaviour {
 			tango.m_3drUseAreaDescriptionPose = false;
 			tango.m_3drMinNumVertices = 20;
 		}
+		alphaSlider.Toggle (currentState);
 		dynamicMesh.SetActive (currentState);
-		UpdateSurfacePrefabMaterial ();
+		surface.SetMaterial (brickMenu.GetMaterialByColor("Default"));
 		SwitchMaterials ();
 	}
 
-	public static bool IsOccluding() {
-		return _isOccluding;
-	}
-
-	//HACK Also in Surface
+	/// <summary>
+	/// Switches the materials based on occlusion setting. Materials look the same but have different shaders.
+	/// </summary>
 	private void SwitchMaterials() {
 		var gameObjects = GameObject.FindGameObjectsWithTag ("Surface");
 		foreach (var go in gameObjects) {
@@ -53,13 +58,5 @@ public class OcclusionController : MonoBehaviour {
 			surface.SetMaterial (material);
 		}
 
-	}
-
-	private void UpdateSurfacePrefabMaterial() {
-		if (_isOccluding) {
-			surface.SetMaterial (defaultMaterials[0]);
-		} else {
-			surface.SetMaterial (defaultMaterials[1]);
-		}
 	}
 }

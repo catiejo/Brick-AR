@@ -1,49 +1,26 @@
 ﻿Shader "CatieJo/Dynamic Mesh Shader" 
-//Copied from: https://github.com/stetro/project-tango-poc/blob/master/unity/UnityConstructor/Assets/Shader/MatteShadow.shader
-{
-	Properties 
+{ 
+	Properties {
+		_Alpha ("Alpha", Range (0.0,1.0)) = 0.75
+	}
+	SubShader 
 	{
-	  	_Color ("Main Color", Color) = (1,1,1,1)
-	  	_MainTex ("Base (RGB) Trans (A)", 2D) = "white" {}
-	  	_Cutoff ("Alpha cutoff", Range(0,1)) = 0.5
- 	}
- 
-	 SubShader 
-	 {
-	 
-		  Tags {"Queue" = "Geometry-10" "IgnoreProjector"="True" "RenderType"="TransparentCutout"}
-		  LOD 200
-		  Blend Zero SrcColor
-		  Lighting Off
-		  ZTest LEqual
-		  ZWrite On
-		  ColorMask 0
-		  Pass {}
-		 
-		 CGPROGRAM
-		 #pragma surface surf ShadowOnly alphatest:_Cutoff
-
-		 fixed4 _Color;
-		 
-		 struct Input {
-		 	float2 uv_MainTex;
-		 };
-		 
-		 inline fixed4 LightingShadowOnly (SurfaceOutput s, fixed3 lightDir, fixed atten)
-		 {
-			 fixed4 c;
-			 c.rgb = s.Albedo*atten;
-			 c.a = s.Alpha;
-			 return c;
-		 }
-		 
-		 void surf (Input IN, inout SurfaceOutput o) 
-		 {
-			 fixed4 c = _Color;
-			 o.Albedo = c.rgb;
-			 o.Alpha = 1;
-		 }
-		 ENDCG
-	 }
-	 Fallback "Transparent/Cutout/VertexLit"
+		Tags { "Queue"="Geometry" } //Transparent queue doesn't get written to depth buffer, even with ZWrite On
+		CGPROGRAM
+		#pragma surface surf Lambert alpha vertex:vert addshadow
+		float _Alpha;
+		struct Input {
+			float3 customColor;
+		};
+		void vert (inout appdata_full v, out Input o) {
+        	UNITY_INITIALIZE_OUTPUT(Input,o);
+        	o.customColor = abs(v.normal);
+      	}
+		void surf (Input IN, inout SurfaceOutput o) {
+			o.Albedo = IN.customColor;
+			o.Alpha = _Alpha;
+		}
+		ENDCG
+    }
+	Fallback "Transparent/Cutout/VertexLit"
  }
